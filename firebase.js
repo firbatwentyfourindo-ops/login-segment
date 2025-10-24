@@ -70,6 +70,6 @@ export async function loginUser(email, password) {
 // 🔒 Redirect otomatis setelah login
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    window.location.href = "dashboard.html"; // nanti bisa kamu ubah jadi link khusus
+    window.location.href = "https://gemini.google.com/share/e5198853cb0b"; // nanti bisa kamu ubah jadi link khusus
   }
 });
