@@ -1,7 +1,18 @@
 // firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  setPersistence, 
+  browserLocalPersistence, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 // 🔐 Firebase config
 const firebaseConfig = {
@@ -30,28 +41,35 @@ function getDeviceId() {
   return id;
 }
 
-// 🚪 Fungsi login
+// 🚪 Fungsi login dan pencatatan token
 export async function loginUser(email, password) {
   await setPersistence(auth, browserLocalPersistence);
   const userCred = await signInWithEmailAndPassword(auth, email, password);
-
+  
+  const user = userCred.user;
   const deviceId = getDeviceId();
-  const userRef = doc(db, "users", userCred.user.uid, "devices", deviceId);
-
-  await setDoc(userRef, {
+  
+  // 🔥 Buat token unik dari UID + device
+  const token = `${user.uid}_${deviceId}`;
+  
+  // 🗃️ Simpan ke Firestore pada collection "tokens"
+  const docRef = doc(db, "tokens", token);
+  await setDoc(docRef, {
+    token,
+    uid: user.uid,
+    email: user.email,
     deviceId,
-    email,
-    lastLogin: serverTimestamp(),
     userAgent: navigator.userAgent,
     platform: navigator.platform,
-  });
-
-  return userCred.user;
+    lastLogin: serverTimestamp()
+  }, { merge: true });
+  
+  return token;
 }
 
-// 🔒 Auto redirect kalau sudah login
+// 🔒 Redirect otomatis setelah login
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    window.location.href = "dashboard.html"; // arahkan setelah login
+    window.location.href = "dashboard.html"; // nanti bisa kamu ubah jadi link khusus
   }
 });
