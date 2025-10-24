@@ -1,20 +1,7 @@
-// firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  setPersistence, 
-  browserLocalPersistence, 
-  onAuthStateChanged 
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// 🔐 Firebase config
+// Konfigurasi Firebase kamu
 const firebaseConfig = {
   apiKey: "AIzaSyDpMUow-RIx05qGbqWZYDBdPVssXavi39g",
   authDomain: "preset-tokengrecia.firebaseapp.com",
@@ -25,51 +12,22 @@ const firebaseConfig = {
   measurementId: "G-RXKLR9G7MK"
 };
 
-// 🚀 Init Firebase
+// Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🧠 Generate ID unik per device
-function getDeviceId() {
-  const key = "device_id";
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(key, id);
-  }
-  return id;
-}
-
-// 🚪 Fungsi login dan pencatatan token
-export async function loginUser(email, password) {
-  await setPersistence(auth, browserLocalPersistence);
-  const userCred = await signInWithEmailAndPassword(auth, email, password);
-  
-  const user = userCred.user;
-  const deviceId = getDeviceId();
-  
-  // 🔥 Buat token unik dari UID + device
-  const token = `${user.uid}_${deviceId}`;
-  
-  // 🗃️ Simpan ke Firestore pada collection "tokens"
+// 🔍 Fungsi validasi token
+export async function validateToken(token) {
   const docRef = doc(db, "tokens", token);
-  await setDoc(docRef, {
-    token,
-    uid: user.uid,
-    email: user.email,
-    deviceId,
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    lastLogin: serverTimestamp()
-  }, { merge: true });
-  
-  return token;
-}
+  const docSnap = await getDoc(docRef);
 
-// 🔒 Redirect otomatis setelah login
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "https://gemini.google.com/share/e5198853cb0b"; // nanti bisa kamu ubah jadi link khusus
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    if (data.valid === true) {
+      console.log("Token valid:", data);
+      return true;
+    }
   }
-});
+  console.warn("Token tidak ditemukan:", token);
+  return false;
+}
