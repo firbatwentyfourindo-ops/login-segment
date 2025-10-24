@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebas
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// 🔐 Konfigurasi Firebase
+// 🔐 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDpMUow-RIx05qGbqWZYDBdPVssXavi39g",
   authDomain: "preset-tokengrecia.firebaseapp.com",
@@ -14,12 +14,12 @@ const firebaseConfig = {
   measurementId: "G-RXKLR9G7MK"
 };
 
-// 🔧 Inisialisasi Firebase
+// 🚀 Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🧠 Generate ID unik per-device (disimpan di localStorage)
+// 🧠 Generate ID unik per device
 function getDeviceId() {
   const key = "device_id";
   let id = localStorage.getItem(key);
@@ -32,7 +32,7 @@ function getDeviceId() {
 
 // 🚪 Fungsi login
 export async function loginUser(email, password) {
-  await setPersistence(auth, browserLocalPersistence); // simpan sesi di browser
+  await setPersistence(auth, browserLocalPersistence);
   const userCred = await signInWithEmailAndPassword(auth, email, password);
 
   const deviceId = getDeviceId();
@@ -49,9 +49,9 @@ export async function loginUser(email, password) {
   return userCred.user;
 }
 
-// 🔒 Auto-redirect kalau sudah login
+// 🔒 Auto redirect kalau sudah login
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    window.location.href = "dashboard.html"; // arahkan ke halaman aman
+    window.location.href = "dashboard.html"; // arahkan setelah login
   }
 });
