@@ -47,7 +47,8 @@
         const isValid = await validateToken(token);
         if (isValid) {
           console.log("✅ Token valid, redirecting...");
-          window.location.href = "https://gemini.google.com/share/e5198853cb0b"; // halaman selanjutnya
+          // 🔗 Ganti URL redirect ke link tujuan kamu
+          window.location.href = "https://gemini.google.com/share/e5198853cb0b";
         } else {
           errorMsg.textContent = "Token tidak valid atau sudah kedaluwarsa.";
           errorMsg.classList.remove("hidden");
