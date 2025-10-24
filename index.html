@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Token Access</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center min-h-screen text-gray-100">
+
+  <div class="bg-gray-800/60 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-sm">
+    <h1 class="text-2xl font-semibold text-center mb-6">Login ke Sistem Token</h1>
+    
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label for="email" class="block mb-1 text-sm">Email</label>
+        <input type="email" id="email" name="email" required
+          class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+      </div>
+
+      <div>
+        <label for="password" class="block mb-1 text-sm">Kata Sandi</label>
+        <input type="password" id="password" name="password" required
+          class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+      </div>
+
+      <button type="submit"
+        class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold transition">
+        Masuk
+      </button>
+
+      <p id="errorMsg" class="text-red-400 text-sm text-center hidden mt-3"></p>
+    </form>
+
+    <p class="text-xs text-center text-gray-400 mt-6">
+      Sistem ini menggunakan autentikasi berbasis device.<br />
+      Pastikan login dari perangkat yang sama.
+    </p>
+  </div>
+
+  <!-- 🔥 Import firebase.js -->
+  <script type="module">
+    import { loginUser } from "./firebase.js";
+
+    const form = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorMsg.classList.add("hidden");
+
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
+
+      try {
+        const token = await loginUser(email, password);
+        console.log("✅ Login berhasil:", token);
+        // Redirect ditangani otomatis oleh firebase.js -> onAuthStateChanged
+      } catch (err) {
+        console.error("❌ Error:", err);
+        errorMsg.textContent = "Login gagal: " + (err.message || "Periksa kembali akun Anda");
+        errorMsg.classList.remove("hidden");
+      }
+    });
+  </script>
+</body>
+</html>
