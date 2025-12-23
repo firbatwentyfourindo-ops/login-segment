@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Admin Baru - Event Grecia</title>
+    <title>Portal Administrator - Event Grecia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -24,29 +24,53 @@
         const db = getFirestore(app);
         const appId = firebaseConfig.appId;
 
-        // DAFTAR ADMIN UTAMA (SUPER ADMIN)
-        const ADMIN_WHITELIST = ["admin@grecia.com", "your-email@gmail.com"];
+        // SUPER ADMIN WHITELIST (Hanya mereka yang bisa mendaftarkan admin lain)
+        const SUPER_ADMINS = ["admin@grecia.com", "your-email@gmail.com"];
 
-        const regForm = document.getElementById('reg-form');
-        const accessDenied = document.getElementById('access-denied');
+        const authView = document.getElementById('auth-view');
+        const regView = document.getElementById('reg-view');
         const loading = document.getElementById('loading');
+        const statusMsg = document.getElementById('status-msg');
 
-        // 1. Verifikasi: Hanya Admin yang bisa mendaftarkan Admin lain
+        // 1. Monitor Status Login
         onAuthStateChanged(auth, async (user) => {
             loading.classList.add('hidden');
-            if (user && ADMIN_WHITELIST.includes(user.email)) {
-                regForm.classList.remove('hidden');
+            if (user) {
+                // Cek apakah dia Super Admin
+                if (SUPER_ADMINS.includes(user.email)) {
+                    showRegistrationForm(user.email);
+                } else {
+                    // Cek apakah dia admin biasa di Firestore
+                    const adminSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/admins`, user.email.replace('.', '_')));
+                    if (adminSnap.exists()) {
+                        window.location.href = "administrator.html";
+                    } else {
+                        statusMsg.innerText = "Email Anda tidak terdaftar sebagai Administrator.";
+                        authView.classList.remove('hidden');
+                    }
+                }
             } else {
-                accessDenied.classList.remove('hidden');
+                authView.classList.remove('hidden');
+                regView.classList.add('hidden');
             }
         });
 
+        function showRegistrationForm(email) {
+            authView.classList.add('hidden');
+            regView.classList.remove('hidden');
+            document.getElementById('admin-identifier').innerText = `Login sebagai Super Admin: ${email}`;
+        }
+
         window.loginAdmin = async () => {
             const provider = new GoogleAuthProvider();
-            try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message); }
+            try { 
+                statusMsg.innerText = "Sedang memverifikasi...";
+                await signInWithPopup(auth, provider); 
+            } catch (e) { 
+                statusMsg.innerText = "Gagal Login: " + e.message; 
+            }
         };
 
-        // 2. Fungsi Registrasi Admin Baru
         window.handleAdminRegistration = async (event) => {
             event.preventDefault();
             const targetEmail = document.getElementById('new-admin-email').value;
@@ -55,7 +79,6 @@
             if (!targetEmail || !adminName) return alert("Semua data wajib diisi");
 
             try {
-                // Simpan ke koleksi khusus admins
                 await setDoc(doc(db, `artifacts/${appId}/public/data/admins`, targetEmail.replace('.', '_')), {
                     email: targetEmail,
                     name: adminName,
@@ -64,46 +87,67 @@
                     createdAt: serverTimestamp()
                 });
 
-                alert(`Berhasil! ${targetEmail} kini terdaftar sebagai admin.`);
+                alert(`Berhasil mendaftarkan ${targetEmail} sebagai Admin baru.`);
                 event.target.reset();
             } catch (e) {
-                alert("Gagal: " + e.message);
+                alert("Gagal mendaftar: " + e.message);
             }
         };
+
+        window.logout = () => signOut(auth).then(() => window.location.reload());
     </script>
 </head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-6">
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-6 font-sans">
 
-    <div id="loading" class="text-white">Memuat...</div>
-
-    <!-- Tampilan Jika Bukan Admin -->
-    <div id="access-denied" class="hidden text-center max-w-sm">
-        <h1 class="text-white text-2xl font-bold mb-4">Akses Terbatas</h1>
-        <p class="text-slate-400 mb-6">Anda harus login sebagai Super Admin untuk mendaftarkan administrator baru.</p>
-        <button onclick="loginAdmin()" class="bg-indigo-600 text-white px-6 py-2 rounded font-bold">Login Super Admin</button>
+    <!-- Loading -->
+    <div id="loading" class="text-white flex flex-col items-center">
+        <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-sm font-medium">Memuat Portal Admin...</p>
     </div>
 
-    <!-- Form Registrasi Admin (Hanya muncul untuk Admin) -->
-    <div id="reg-form" class="hidden w-full max-w-md bg-white rounded-2xl p-8 shadow-2xl">
-        <h2 class="text-2xl font-black text-slate-800 mb-2">Tambah Admin</h2>
-        <p class="text-slate-500 text-sm mb-6">Daftarkan email administrator baru untuk mengakses dashboard control.</p>
+    <!-- VIEW 1: LOGIN (Hanya tombol Login) -->
+    <div id="auth-view" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl text-center">
+        <div class="mb-8">
+            <div class="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <span class="text-4xl">🔐</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-800">Admin Login</h1>
+            <p class="text-slate-500 mt-2 text-sm">Masuk untuk mengelola event atau mendaftarkan admin baru.</p>
+        </div>
+
+        <button onclick="loginAdmin()" class="w-full bg-slate-800 text-white flex items-center justify-center gap-3 p-4 rounded-xl font-bold hover:bg-slate-900 transition shadow-lg">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
+            Masuk dengan Google
+        </button>
+        
+        <p id="status-msg" class="mt-6 text-xs font-bold text-red-500 uppercase tracking-tighter"></p>
+    </div>
+
+    <!-- VIEW 2: REGISTER (Hanya muncul jika yang login adalah Super Admin) -->
+    <div id="reg-view" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl">
+        <div class="mb-6">
+            <h2 class="text-2xl font-black text-slate-800">Daftarkan Admin</h2>
+            <p id="admin-identifier" class="text-indigo-600 text-[10px] font-bold uppercase mt-1"></p>
+        </div>
 
         <form onsubmit="handleAdminRegistration(event)" class="space-y-4">
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nama Lengkap</label>
-                <input type="text" id="new-admin-name" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 ml-1">Nama Lengkap</label>
+                <input type="text" id="new-admin-name" required class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition bg-slate-50">
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Email Google Admin</label>
-                <input type="email" id="new-admin-email" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="email@gmail.com">
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 ml-1">Email Google Admin</label>
+                <input type="email" id="new-admin-email" required class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition bg-slate-50" placeholder="admin@gmail.com">
             </div>
-            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-lg font-black hover:bg-indigo-700 transition">
-                Daftarkan Admin
+            
+            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 mt-2">
+                Simpan Admin Baru
             </button>
         </form>
         
-        <div class="mt-6 pt-6 border-t text-center">
-            <a href="administrator.html" class="text-indigo-600 font-bold text-sm"> Kembali ke Dashboard &rarr;</a>
+        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3 text-center">
+            <a href="administrator.html" class="text-indigo-600 font-extrabold text-sm hover:underline"> Ke Dashboard Admin &rarr;</a>
+            <button onclick="logout()" class="text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-red-500">Keluar / Ganti Akun</button>
         </div>
     </div>
 
