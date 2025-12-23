@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Event Grecia</title>
+    <title>Registrasi Admin Baru - Event Grecia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
@@ -24,262 +24,87 @@
         const db = getFirestore(app);
         const appId = firebaseConfig.appId;
 
-        // DAFTAR ADMIN (Whitelist)
-        // Dalam produksi, sebaiknya gunakan Custom Claims atau koleksi khusus 'admins'
+        // DAFTAR ADMIN UTAMA (SUPER ADMIN)
         const ADMIN_WHITELIST = ["admin@grecia.com", "your-email@gmail.com"];
 
-        const mainContent = document.getElementById('main-content');
+        const regForm = document.getElementById('reg-form');
         const accessDenied = document.getElementById('access-denied');
         const loading = document.getElementById('loading');
 
-        let activeSessionId = "session_default";
-
-        // 1. Verifikasi Admin & Proteksi Halaman
+        // 1. Verifikasi: Hanya Admin yang bisa mendaftarkan Admin lain
         onAuthStateChanged(auth, async (user) => {
+            loading.classList.add('hidden');
             if (user && ADMIN_WHITELIST.includes(user.email)) {
-                loading.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                initAdminDashboard();
+                regForm.classList.remove('hidden');
             } else {
-                loading.classList.add('hidden');
                 accessDenied.classList.remove('hidden');
             }
         });
 
-        function initAdminDashboard() {
-            loadGlobalSettings();
-            listenToRegistrations();
-            listenToAttendance();
-        }
-
-        // 2. Monitoring Pengaturan Sesi (Global Settings)
-        async function loadGlobalSettings() {
-            const settingsRef = doc(db, `artifacts/${appId}/public/data/global`, "settings");
-            onSnapshot(settingsRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    activeSessionId = data.sessionId;
-                    document.getElementById('current-session-display').innerText = activeSessionId;
-                    document.getElementById('yt-link-input').value = data.youtubeUrl || "";
-                    document.getElementById('zoom-link-input').value = data.zoomUrl || "";
-                }
-            });
-        }
-
-        // 3. Update Sesi & Link (Hanya Admin yang Bisa Menulis ke Global)
-        window.updateSession = async () => {
-            const newSession = document.getElementById('session-id-input').value;
-            const ytLink = document.getElementById('yt-link-input').value;
-            const zoomLink = document.getElementById('zoom-link-input').value;
-
-            if (!newSession) return alert("Session ID wajib diisi!");
-
-            try {
-                await setDoc(doc(db, `artifacts/${appId}/public/data/global`, "settings"), {
-                    sessionId: newSession,
-                    youtubeUrl: ytLink,
-                    zoomUrl: zoomLink,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-                alert("Sesi Berhasil Diperbarui!");
-            } catch (e) {
-                alert("Error: " + e.message);
-            }
+        window.loginAdmin = async () => {
+            const provider = new GoogleAuthProvider();
+            try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message); }
         };
 
-        // 4. Listen Data Registrasi (Realtime)
-        function listenToRegistrations() {
-            const regRef = collection(db, `artifacts/${appId}/public/data/registrations`);
-            onSnapshot(regRef, (snapshot) => {
-                const listBody = document.getElementById('registration-list');
-                listBody.innerHTML = "";
-                
-                document.getElementById('total-registrants').innerText = snapshot.size;
+        // 2. Fungsi Registrasi Admin Baru
+        window.handleAdminRegistration = async (event) => {
+            event.preventDefault();
+            const targetEmail = document.getElementById('new-admin-email').value;
+            const adminName = document.getElementById('new-admin-name').value;
+            
+            if (!targetEmail || !adminName) return alert("Semua data wajib diisi");
 
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const row = `
-                        <tr class="border-b hover:bg-slate-50 transition">
-                            <td class="p-3 text-sm font-medium text-slate-700">${data.fullName || '-'}</td>
-                            <td class="p-3 text-sm text-slate-600">${data.email || '-'}</td>
-                            <td class="p-3 text-sm text-slate-600">${data.method || '-'}</td>
-                            <td class="p-3 text-sm text-slate-500">${data.submittedAt?.toDate().toLocaleString('id-ID') || '-'}</td>
-                        </tr>
-                    `;
-                    listBody.innerHTML += row;
+            try {
+                // Simpan ke koleksi khusus admins
+                await setDoc(doc(db, `artifacts/${appId}/public/data/admins`, targetEmail.replace('.', '_')), {
+                    email: targetEmail,
+                    name: adminName,
+                    role: "admin",
+                    addedBy: auth.currentUser.email,
+                    createdAt: serverTimestamp()
                 });
-            });
-        }
 
-        // 5. Listen Data Absensi (Realtime)
-        function listenToAttendance() {
-            const attRef = collection(db, `artifacts/${appId}/public/data/attendance`);
-            onSnapshot(attRef, (snapshot) => {
-                const listBody = document.getElementById('attendance-list');
-                listBody.innerHTML = "";
-                
-                // Filter di frontend untuk performa sederhana (Rule 2 Firestore)
-                const currentSessionData = snapshot.docs
-                    .map(d => d.data())
-                    .filter(d => d.sessionId === activeSessionId);
-
-                document.getElementById('total-attendance').innerText = currentSessionData.length;
-
-                currentSessionData.forEach((data) => {
-                    const row = `
-                        <tr class="border-b hover:bg-green-50 transition">
-                            <td class="p-3 text-sm font-bold text-indigo-600">${data.userName || 'User'}</td>
-                            <td class="p-3 text-sm text-slate-600">${data.channel || 'Live'}</td>
-                            <td class="p-3 text-sm text-slate-500">${data.clickedAt?.toDate().toLocaleString('id-ID') || '-'}</td>
-                            <td class="p-3 text-sm text-slate-400 font-mono text-xs">${data.uid}</td>
-                        </tr>
-                    `;
-                    listBody.innerHTML += row;
-                });
-            });
-        }
-
-        window.logout = () => signOut(auth).then(() => window.location.reload());
-
+                alert(`Berhasil! ${targetEmail} kini terdaftar sebagai admin.`);
+                event.target.reset();
+            } catch (e) {
+                alert("Gagal: " + e.message);
+            }
+        };
     </script>
 </head>
-<body class="bg-slate-100 min-h-screen font-sans">
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-6">
 
-    <!-- Loading State -->
-    <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div class="text-center">
-            <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p class="mt-4 text-slate-500 font-medium tracking-wide">Memverifikasi Admin...</p>
-        </div>
+    <div id="loading" class="text-white">Memuat...</div>
+
+    <!-- Tampilan Jika Bukan Admin -->
+    <div id="access-denied" class="hidden text-center max-w-sm">
+        <h1 class="text-white text-2xl font-bold mb-4">Akses Terbatas</h1>
+        <p class="text-slate-400 mb-6">Anda harus login sebagai Super Admin untuk mendaftarkan administrator baru.</p>
+        <button onclick="loginAdmin()" class="bg-indigo-600 text-white px-6 py-2 rounded font-bold">Login Super Admin</button>
     </div>
 
-    <!-- Access Denied -->
-    <div id="access-denied" class="hidden fixed inset-0 bg-white z-50 flex items-center justify-center p-6 text-center">
-        <div class="max-w-sm">
-            <div class="text-red-500 text-6xl mb-4">🚫</div>
-            <h1 class="text-2xl font-bold text-slate-800">Akses Ditolak</h1>
-            <p class="text-slate-500 mt-2">Halaman ini hanya untuk administrator resmi Event Grecia.</p>
-            <button onclick="logout()" class="mt-6 bg-slate-800 text-white px-6 py-2 rounded-lg font-bold">Logout & Kembali</button>
+    <!-- Form Registrasi Admin (Hanya muncul untuk Admin) -->
+    <div id="reg-form" class="hidden w-full max-w-md bg-white rounded-2xl p-8 shadow-2xl">
+        <h2 class="text-2xl font-black text-slate-800 mb-2">Tambah Admin</h2>
+        <p class="text-slate-500 text-sm mb-6">Daftarkan email administrator baru untuk mengakses dashboard control.</p>
+
+        <form onsubmit="handleAdminRegistration(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nama Lengkap</label>
+                <input type="text" id="new-admin-name" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Email Google Admin</label>
+                <input type="email" id="new-admin-email" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="email@gmail.com">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-lg font-black hover:bg-indigo-700 transition">
+                Daftarkan Admin
+            </button>
+        </form>
+        
+        <div class="mt-6 pt-6 border-t text-center">
+            <a href="administrator.html" class="text-indigo-600 font-bold text-sm"> Kembali ke Dashboard &rarr;</a>
         </div>
-    </div>
-
-    <!-- Main Admin Content -->
-    <div id="main-content" class="hidden">
-        
-        <!-- Header -->
-        <header class="bg-indigo-900 text-white p-4 shadow-lg sticky top-0 z-30 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <span class="bg-white text-indigo-900 px-3 py-1 rounded font-black">ADMIN</span>
-                <h1 class="font-bold text-lg hidden md:block">Grecia Event Control</h1>
-            </div>
-            <div class="flex items-center gap-4 text-sm">
-                <span id="current-session-display" class="bg-indigo-700 px-3 py-1 rounded-full font-mono">...</span>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-1 rounded font-bold transition">Keluar</button>
-            </div>
-        </header>
-
-        <main class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
-
-            <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Registrasi</p>
-                    <h2 id="total-registrants" class="text-4xl font-black text-slate-800">0</h2>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Hadir Sesi Aktif</p>
-                    <h2 id="total-attendance" class="text-4xl font-black text-green-600">0</h2>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Status Sistem</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                        <span class="text-green-600 font-bold">LIVE MONITORING</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Session Control -->
-            <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b border-slate-200">
-                    <h3 class="font-bold text-slate-700 flex items-center gap-2">
-                        ⚙️ Kontrol Sesi & Link Live
-                    </h3>
-                </div>
-                <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Session ID (Pemicu Absensi)</label>
-                        <input id="session-id-input" type="text" placeholder="Contoh: SESI_PAGI_01" class="w-full p-2 border rounded bg-slate-50 font-mono text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">YouTube URL</label>
-                        <input id="yt-link-input" type="text" placeholder="https://..." class="w-full p-2 border rounded bg-slate-50 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Zoom URL</label>
-                        <input id="zoom-link-input" type="text" placeholder="https://..." class="w-full p-2 border rounded bg-slate-50 text-sm">
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="updateSession()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded shadow hover:bg-indigo-700 transition">
-                            Update Kontrol
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                <!-- Registration Table -->
-                <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-700">Daftar User Terdaftar</h3>
-                    </div>
-                    <div class="overflow-x-auto max-h-[400px]">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 sticky top-0 border-b">
-                                <tr>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Nama</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Email</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Login</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Waktu</th>
-                                </tr>
-                            </thead>
-                            <tbody id="registration-list">
-                                <!-- Data via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- Attendance Table -->
-                <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-700">Log Kehadiran (Sesi Ini)</h3>
-                    </div>
-                    <div class="overflow-x-auto max-h-[400px]">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 sticky top-0 border-b">
-                                <tr>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">User</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Channel</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Check-In</th>
-                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">UID</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-list">
-                                <!-- Data via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-            </div>
-
-        </main>
-        
-        <footer class="p-8 text-center text-slate-400 text-xs">
-            <p>GRECIA ARCHITECTURE &bull; FIREBASE REALTIME MANAGEMENT SYSTEM</p>
-        </footer>
     </div>
 
 </body>
