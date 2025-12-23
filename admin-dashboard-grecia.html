@@ -114,7 +114,6 @@
                 </button>
             </nav>
         </div>
-        <!-- Bottom status removed as requested -->
     </aside>
 
     <!-- Main Content -->
@@ -126,7 +125,6 @@
                 <p id="page-subtitle" class="text-xs text-slate-500 font-medium mt-0.5">Ringkasan aktivitas platform hari ini.</p>
             </div>
             
-            <!-- User/Session info removed as requested -->
             <div class="flex items-center gap-4">
             </div>
         </header>
@@ -198,31 +196,19 @@
                     </div>
                 </section>
 
-                <!-- Tab: Viewers (Improved Table) -->
+                <!-- Tab: Viewers (Improved Layout: Grouped History) -->
                 <section id="tab-viewers" class="hidden fade-in">
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
                         <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-bold text-slate-800">Daftar Kehadiran</h3>
+                            <h3 class="font-bold text-slate-800">Riwayat Kehadiran (Grouped by Session)</h3>
                             <div class="flex gap-2">
                                 <span class="w-3 h-3 rounded-full bg-red-400"></span>
                                 <span class="w-3 h-3 rounded-full bg-amber-400"></span>
                                 <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr>
-                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">User Info</th>
-                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Channel</th>
-                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Check-in Time</th>
-                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Target Session</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="viewer-list" class="divide-y divide-slate-50">
-                                    <!-- JS Content -->
-                                </tbody>
-                            </table>
+                        <div id="viewer-list" class="p-8 space-y-8">
+                            <!-- JS Content will be injected here as Grouped Lists -->
                         </div>
                     </div>
                 </section>
@@ -239,6 +225,8 @@
                                     <tr>
                                         <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nama Lengkap</th>
                                         <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Email Address</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">No. Telepon</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Info Dari</th>
                                         <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Auth Method</th>
                                         <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Joined Date</th>
                                     </tr>
@@ -421,49 +409,89 @@
                 if (snap.exists()) {
                     const data = snap.data();
                     activeSessionId = data.sessionId || "ID-UNKNOWN";
-                    // Removed badge update logic as elements are removed
                 }
             });
 
-            // Attendance
+            // Attendance - GROUPED BY SESSION
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
-                const list = document.getElementById('viewer-list');
-                list.innerHTML = "";
+                const listContainer = document.getElementById('viewer-list');
+                listContainer.innerHTML = "";
+                
+                // Calculate live count (only for active session)
                 const currentCount = snap.docs.filter(d => d.data().sessionId === activeSessionId).length;
                 document.getElementById('stat-viewers').innerText = currentCount;
 
-                snap.forEach(d => {
-                    const it = d.data();
-                    const isCurrent = it.sessionId === activeSessionId;
-                    
-                    list.innerHTML += `
-                        <tr class="table-row-hover transition-colors border-b border-slate-50 last:border-0 ${isCurrent ? 'bg-blue-50/30' : ''}">
-                            <td class="px-8 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-xs text-indigo-600">
-                                        ${(it.userName || 'U').charAt(0).toUpperCase()}
+                // Group data by Session ID
+                const grouped = {};
+                snap.docs.forEach(doc => {
+                    const data = doc.data();
+                    const sid = data.sessionId || 'UNKNOWN-SESSION';
+                    if (!grouped[sid]) grouped[sid] = [];
+                    grouped[sid].push({ id: doc.id, ...data });
+                });
+
+                // Iterate Groups (We can sort groups if needed, here we just use object keys order)
+                // To sort by session name desc or date desc, we would need to convert to array first.
+                // Assuming alphabetical sort of Session ID for now or reverse insertion order if numeric
+                const sessionIds = Object.keys(grouped).sort().reverse(); 
+
+                sessionIds.forEach(sid => {
+                    const items = grouped[sid];
+                    // Sort items inside group by time descending (newest first)
+                    items.sort((a, b) => (b.clickedAt?.seconds || 0) - (a.clickedAt?.seconds || 0));
+
+                    // Build Header
+                    let groupHtml = `
+                        <div class="relative">
+                            <div class="sticky top-0 bg-white/95 backdrop-blur-sm z-10 py-3 border-b-2 border-slate-100 mb-4 flex items-center justify-between">
+                                <h4 class="font-extrabold text-blue-600 text-sm tracking-wider uppercase flex items-center gap-2">
+                                    <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                                    ${sid}
+                                </h4>
+                                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 shadow-sm">${items.length} Peserta</span>
+                            </div>
+                            <div class="space-y-3 pl-4 border-l-2 border-slate-50 ml-1.5 pb-2">
+                    `;
+
+                    // Build Items
+                    items.forEach(it => {
+                        const date = it.clickedAt?.toDate();
+                        
+                        // Formatter: Selasa, 23/12/25
+                        const dateStr = date ? new Intl.DateTimeFormat('id-ID', { 
+                            weekday: 'long', 
+                            day: '2-digit', 
+                            month: '2-digit', 
+                            year: '2-digit' 
+                        }).format(date) : '-';
+                        
+                        // Formatter: 17.52 WIB
+                        const timeStr = date ? new Intl.DateTimeFormat('id-ID', { 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            timeZoneName: 'short'
+                        }).format(date) : '-';
+
+                        // Combined string as requested: user1 . selasa, 23/12/25 : 17.52 WIB, judul-agenda001
+                        // We will display: Date : Time
+                        const formattedTime = `${dateStr} : ${timeStr.replace('.', ':')}`; 
+
+                        groupHtml += `
+                            <div class="flex items-start gap-4 group hover:bg-slate-50 p-2.5 rounded-xl transition-all duration-200">
+                                 <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors shadow-sm"></div>
+                                 <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold text-slate-800 text-sm">${it.userName || 'Anonymous'}</span>
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded text-slate-500 bg-slate-100 font-mono border border-slate-200 uppercase tracking-tight">${it.channel || 'WEB'}</span>
                                     </div>
-                                    <div>
-                                        <div class="font-bold text-slate-700 text-sm">${it.userName || 'Anonymous'}</div>
-                                        <div class="text-[10px] text-slate-400 font-mono">ID: ${d.id.substring(0,6)}...</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-4">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${it.channel === 'YOUTUBE' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}">
-                                    ${it.channel === 'YOUTUBE' ? '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>' : ''}
-                                    ${it.channel || 'LINK'}
-                                </span>
-                            </td>
-                            <td class="px-8 py-4 text-sm font-medium text-slate-500 font-mono">
-                                ${formatTime(it.clickedAt?.toDate())} WIB
-                            </td>
-                            <td class="px-8 py-4">
-                                <span class="text-[10px] font-bold px-2 py-1 rounded border ${isCurrent ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 text-slate-400'}">
-                                    ${it.sessionId || 'N/A'}
-                                </span>
-                            </td>
-                        </tr>`;
+                                    <p class="text-xs text-slate-400 font-medium font-mono">${formattedTime}</p>
+                                 </div>
+                            </div>
+                        `;
+                    });
+
+                    groupHtml += `</div></div>`;
+                    listContainer.innerHTML += groupHtml;
                 });
             });
 
@@ -478,6 +506,10 @@
                     <tr class="table-row-hover border-b border-slate-50 last:border-0">
                         <td class="px-8 py-4 font-semibold text-slate-700 text-sm">${it.fullName || '-'}</td>
                         <td class="px-8 py-4 text-slate-500 text-sm">${it.email || '-'}</td>
+                        <td class="px-8 py-4 text-slate-500 text-sm font-mono">${it.phoneNumber || '-'}</td>
+                        <td class="px-8 py-4">
+                            <span class="text-[10px] text-slate-500 px-2 py-1 bg-slate-50 rounded-md border border-slate-100">${it.referralSource || '-'}</span>
+                        </td>
                         <td class="px-8 py-4">
                              <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded-md border border-slate-200">${it.method || 'AUTH'}</span>
                         </td>
