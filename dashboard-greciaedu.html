@@ -101,64 +101,61 @@
     <div id="main-container" class="w-full max-w-sm hidden animate__animated animate__fadeIn">
         
         <!-- Header & Profile -->
-        <div class="flex items-center justify-between mb-8 px-2">
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-50 p-1.5">
-                    <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="w-full h-full object-contain">
-                </div>
-                <div>
-                    <h1 class="font-bold text-slate-800 text-sm leading-tight">Grecia<span class="text-blue-600">Edu</span></h1>
-                    <p class="text-[10px] text-slate-400 font-medium">Dashboard Peserta</p>
-                </div>
-            </div>
+        <div class="flex items-center justify-between mb-6">
+            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo Grecia" class="h-8 object-contain">
             
-            <div id="user-profile" class="flex items-center gap-2 bg-white/60 p-1.5 pr-3 rounded-full border border-slate-100 shadow-sm backdrop-blur-sm">
-                <div id="user-initial" class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm border border-white">
-                    ?
+            <div id="user-profile" class="flex items-center gap-2 bg-white/60 p-1 pr-3 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm">
+                <!-- Avatar Image or Initial -->
+                <div class="w-7 h-7 rounded-full overflow-hidden border border-white bg-slate-100 flex items-center justify-center">
+                    <img id="user-avatar" src="" class="w-full h-full object-cover hidden">
+                    <span id="user-initial" class="text-[10px] font-bold text-slate-500">U</span>
                 </div>
                 <div class="flex flex-col">
-                    <span id="user-name" class="text-[10px] font-bold text-slate-700 leading-none truncate max-w-[80px]">User</span>
-                    <span class="text-[8px] text-emerald-500 font-bold leading-none mt-0.5">As Users</span>
+                    <span id="user-name" class="text-[10px] font-bold text-gray-600 truncate max-w-[80px]">User</span>
+                    <span id="status-indicator" class="text-[8px] text-gray-400 font-bold leading-none mt-0.5">● Offline</span>
                 </div>
             </div>
         </div>
 
-        <!-- Main Card -->
-        <div class="minimal-card rounded-[2.5rem] p-6 relative overflow-hidden">
+        <div class="minimal-card rounded-[2.5rem] p-6 relative">
+             <!-- Session Badge -->
+             <div id="session-badge" class="absolute top-6 right-6 px-2 py-0.5 bg-gray-100 rounded text-[8px] font-bold text-gray-400 uppercase tracking-wider border border-gray-200">
+                OFFLINE
+            </div>
 
             <!-- Tabs Navigation -->
-            <div class="flex border-b border-slate-100 mb-6 mr-16">
-                <button onclick="window.switchTab('youtube')" id="tab-yt" class="tab-btn active flex-1 pb-3 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-blue-500">YouTube</button>
-                <button onclick="window.switchTab('zoom')" id="tab-zm" class="tab-btn flex-1 pb-3 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-blue-500">Zoom</button>
+            <div class="flex border-b border-gray-100 mb-6 mr-14">
+                <button onclick="window.switchTab('youtube')" id="tab-yt" class="tab-btn active flex-1 pb-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-blue-500">YouTube</button>
+                <button onclick="window.switchTab('zoom')" id="tab-zm" class="tab-btn flex-1 pb-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-blue-500">Zoom</button>
             </div>
 
             <!-- Loader State -->
             <div id="session-loader" class="py-12 text-center hidden">
-                <div class="w-8 h-8 border-2 border-slate-100 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sinkronisasi Sesi...</p>
+                <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sinkronisasi Sesi...</p>
             </div>
 
             <!-- No Session State -->
             <div id="no-session-state" class="py-10 text-center hidden">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <h3 class="text-slate-800 font-bold text-sm">Belum Ada Sesi</h3>
-                <p class="text-[10px] text-slate-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Admin belum memulai sesi live. Silakan tunggu sebentar.</p>
+                <h3 class="text-gray-800 font-bold text-xs">Belum Ada Sesi</h3>
+                <p class="text-[10px] text-gray-400 mt-1">Admin belum memulai sesi live.</p>
             </div>
 
             <!-- Content: YouTube -->
             <div id="content-youtube" class="tab-content animate__animated animate__fadeIn">
-                <div class="video-preview mb-5 shadow-sm border border-white relative group">
+                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative group">
                     <div id="yt-skeleton" class="skeleton absolute inset-0"></div>
                     <img id="yt-thumb" src="" class="hidden w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     <div class="absolute inset-0 bg-black/5 flex items-center justify-center group-hover:bg-black/10 transition-colors">
-                         <div class="w-12 h-12 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-5 h-5 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                         <div class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-4 h-4 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                         </div>
                     </div>
                 </div>
-                <a id="link-yt" href="#" onclick="window.trackClick('YOUTUBE')" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-red-500/20 tracking-wide uppercase">
+                <a id="link-yt" href="#" onclick="window.trackClick('YOUTUBE')" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-red-600 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-red-100 tracking-wide uppercase">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
                     Buka YouTube Live
                 </a>
@@ -166,20 +163,17 @@
 
             <!-- Content: Zoom -->
             <div id="content-zoom" class="hidden tab-content animate__animated animate__fadeIn">
-                <div class="video-preview mb-5 shadow-sm border border-white relative overflow-hidden">
+                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative overflow-hidden">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50/50"></div>
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10">
-                        <div class="w-14 h-14 bg-white text-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/10 mb-3 transform rotate-3">
-                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <div class="w-12 h-12 bg-white text-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/10 mb-3 transform rotate-3">
+                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </div>
-                        <span class="text-xs font-extrabold text-blue-900 uppercase tracking-widest">Ruang Interaktif Zoom</span>
-                        <p class="text-[9px] text-blue-600/70 mt-1">Tanya jawab langsung dengan instruktur</p>
+                        <span class="text-[10px] font-extrabold text-blue-900 uppercase tracking-widest">Ruang Zoom</span>
+                        <p class="text-[9px] text-blue-600/70 mt-1">Interaksi langsung dengan instruktur</p>
                     </div>
-                    <!-- Decorative Circles -->
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl"></div>
-                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
                 </div>
-                <a id="link-zm" href="#" onclick="window.trackClick('ZOOM')" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-blue-500/20 tracking-wide uppercase">
+                <a id="link-zm" href="#" onclick="window.trackClick('ZOOM')" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-blue-100 tracking-wide uppercase">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5V7.5L16 12L21 16.5ZM4 7C2.89543 7 2 7.89543 2 9V15C2 16.1046 2.89543 17 4 17H12C13.1046 17 14 16.1046 14 15V9C14 7.89543 13.1046 7 12 7H4Z"></path></svg>
                     Gabung Meeting Zoom
                 </a>
@@ -189,19 +183,18 @@
 
         <!-- Attendance Status -->
         <div class="mt-4 flex justify-center">
-            <div id="attendance-status-pill" class="bg-white/50 backdrop-blur-sm border border-slate-100 rounded-full px-4 py-1.5 flex items-center gap-2 opacity-0 transition-opacity duration-500">
-                <div id="status-icon" class="w-2 h-2 rounded-full bg-slate-300"></div>
-                <span id="attendance-text" class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Menunggu Check-in</span>
+            <div id="attendance-status-pill" class="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-full px-4 py-1.5 flex items-center gap-2 opacity-0 transition-opacity duration-500">
+                <div id="status-icon" class="w-2 h-2 rounded-full bg-gray-300"></div>
+                <span id="attendance-text" class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Menunggu Check-in</span>
             </div>
         </div>
 
-        <button onclick="window.logout()" class="mt-8 w-full text-center text-[10px] font-bold text-slate-300 hover:text-red-400 uppercase tracking-widest transition-colors flex items-center justify-center gap-1 group">
-            <svg class="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        <button onclick="window.logout()" class="mt-8 w-full text-center text-[10px] font-bold text-gray-300 hover:text-red-400 uppercase tracking-widest transition-colors">
             Keluar Sesi
         </button>
 
         <footer class="mt-8 text-center">
-            <p class="text-[8px] text-slate-300 font-bold uppercase tracking-[0.3em]">GreciaEdu &copy; 2025</p>
+            <p class="text-[8px] text-gray-300 font-bold uppercase tracking-[0.3em]">GreciaEdu &copy; 2025</p>
         </footer>
     </div>
 
@@ -219,7 +212,7 @@
         </a>
     </div>
 
-    <!-- Toast -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-10 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-2xl z-50 flex items-center gap-2">
         <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
         <span id="toast-msg">Notifikasi</span>
@@ -333,6 +326,17 @@
             }
         }
 
+        function updateSessionBadge(sessionId) {
+            const badge = document.getElementById('session-badge');
+            if (sessionId) {
+                badge.innerText = `SESI: ${sessionId}`;
+                badge.className = "absolute top-6 right-6 px-2 py-0.5 bg-blue-600 rounded text-[8px] font-bold text-white uppercase tracking-wider shadow-sm shadow-blue-500/30";
+            } else {
+                badge.innerText = "OFFLINE";
+                badge.className = "absolute top-6 right-6 px-2 py-0.5 bg-gray-100 rounded text-[8px] font-bold text-gray-400 uppercase tracking-wider border border-gray-200";
+            }
+        }
+
         function updateAttendanceUI(attended) {
             const pill = document.getElementById('attendance-status-pill');
             const text = document.getElementById('attendance-text');
@@ -342,31 +346,48 @@
             
             if (attended) {
                 text.innerText = "Hadir (Tercatat)";
-                text.classList.remove('text-slate-500');
+                text.classList.remove('text-gray-500');
                 text.classList.add('text-emerald-600');
                 icon.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]";
                 pill.className = "bg-emerald-50/80 backdrop-blur-sm border border-emerald-100 rounded-full px-4 py-1.5 flex items-center gap-2 transition-all duration-500";
             } else {
                 text.innerText = "Menunggu Check-in";
-                text.classList.add('text-slate-500');
+                text.classList.add('text-gray-500');
                 text.classList.remove('text-emerald-600');
-                icon.className = "w-2 h-2 rounded-full bg-slate-300 animate-pulse";
-                pill.className = "bg-white/50 backdrop-blur-sm border border-slate-100 rounded-full px-4 py-1.5 flex items-center gap-2 transition-all duration-500";
+                icon.className = "w-2 h-2 rounded-full bg-gray-300 animate-pulse";
+                pill.className = "bg-white/50 backdrop-blur-sm border border-gray-100 rounded-full px-4 py-1.5 flex items-center gap-2 transition-all duration-500";
+            }
+        }
+
+        function updateUserProfile(user) {
+            document.getElementById('user-name').innerText = (user.displayName || 'User').split(' ')[0];
+            const statusIndicator = document.getElementById('status-indicator');
+            const avatar = document.getElementById('user-avatar');
+            const initial = document.getElementById('user-initial');
+
+            statusIndicator.innerText = "● Online";
+            statusIndicator.classList.replace('text-gray-400', 'text-emerald-500');
+
+            if (user.photoURL) {
+                avatar.src = user.photoURL;
+                avatar.classList.remove('hidden');
+                initial.classList.add('hidden');
+            } else {
+                avatar.classList.add('hidden');
+                initial.classList.remove('hidden');
+                initial.innerText = (user.displayName || 'U').charAt(0).toUpperCase();
             }
         }
 
         // --- Firebase Logic ---
 
-        // Catat Absensi (Manual Klik)
         window.trackClick = async (channel) => {
             if (!currentUser || !currentSessionId) return;
 
-            // ID Unik: UID + SESSIONID (Konsisten dengan Dashboard Admin)
             const docId = `${currentUser.uid}_${currentSessionId}`;
             const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId);
             
             try {
-                // Cek dulu biar gak overwrite timestamp lama
                 const snap = await getDoc(attendRef);
                 if (!snap.exists()) {
                     await setDoc(attendRef, {
@@ -379,10 +400,6 @@
                     });
                     showToast("Kehadiran Tercatat!");
                     updateAttendanceUI(true);
-                } else {
-                    // Sudah absen sebelumnya
-                    // Optional: update channel kalau pindah platform?
-                    // await setDoc(attendRef, { channel: channel }, { merge: true });
                 }
             } catch (e) {
                 console.error("Error recording attendance:", e);
@@ -390,10 +407,8 @@
             }
         };
 
-        // Auto Attend Logic (Saat sesi dimuat)
         async function checkAndAutoAttend(sessionId) {
             if (!currentUser || !sessionId) return;
-
             const docId = `${currentUser.uid}_${sessionId}`;
             const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId);
 
@@ -403,8 +418,6 @@
                     updateAttendanceUI(true);
                 } else {
                     updateAttendanceUI(false);
-                    // Jika ingin auto-attend saat dashboard dibuka, uncomment baris bawah:
-                    // window.trackClick('AUTO_DASHBOARD');
                 }
             } catch (err) {
                 console.error("Attendance check failed", err);
@@ -419,20 +432,13 @@
 
             if (user) {
                 currentUser = user;
-                
-                // Update User Profile UI
-                document.getElementById('user-initial').innerText = (user.displayName || 'U').charAt(0).toUpperCase();
-                document.getElementById('user-name').innerText = (user.displayName || 'User').split(' ')[0];
+                updateUserProfile(user);
 
-                // Show Dashboard
                 mainContainer.classList.remove('hidden');
                 loggedOutView.classList.add('hidden');
-                
-                // Hide main loading overlay nicely
                 loadingOverlay.classList.add('opacity-0');
                 setTimeout(() => loadingOverlay.style.display = 'none', 500);
 
-                // Listen to Global Settings (Session)
                 const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
                 
                 onSnapshot(settingsDoc, (snapshot) => {
@@ -440,21 +446,16 @@
                         const data = snapshot.data();
                         const newSessionId = data.sessionId;
 
-                        // Jika sesi berubah/baru dimuat
                         if (newSessionId !== currentSessionId) {
                             currentSessionId = newSessionId;
                             
-                            // Update Links & Thumbnails
                             document.getElementById('link-yt').href = data.youtubeUrl || '#';
                             document.getElementById('link-zm').href = data.zoomUrl || '#';
                             updateThumbnail(data.youtubeUrl);
                             updateSessionBadge(currentSessionId);
-                            
-                            // Reset & Check Absensi untuk sesi baru ini
                             updateAttendanceUI(false); 
                             checkAndAutoAttend(currentSessionId);
                         }
-                        
                         renderTabs();
                     } else {
                         currentSessionId = null;
@@ -467,7 +468,6 @@
                 });
 
             } else {
-                // Logged Out State
                 currentUser = null;
                 loadingOverlay.style.display = 'none';
                 mainContainer.classList.add('hidden');
