@@ -23,25 +23,23 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Screen: Login -->
+    <!-- Screen: Login (Google Auth) -->
     <div id="screen-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 text-center">
+        <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 text-center border border-slate-100">
             <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-12 mx-auto mb-8">
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Portal</h2>
-            <p class="text-slate-500 text-sm mb-8">Masukkan kredensial untuk mengelola sistem.</p>
+            <p class="text-slate-500 text-sm mb-10">Gunakan Akun Google Admin untuk akses sistem.</p>
             
-            <form id="login-form" class="space-y-4 text-left">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Nama Admin</label>
-                    <input type="text" id="login-user" required class="input-field mt-1" placeholder="Username">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Password</label>
-                    <input type="password" id="login-pass" required class="input-field mt-1" placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all">MASUK KE DASHBOARD</button>
-            </form>
-            <p id="login-error" class="text-red-500 text-xs font-bold mt-4 hidden">Username atau Password salah!</p>
+            <button id="btn-google-login" class="w-full flex items-center justify-center gap-4 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
+                <svg class="w-6 h-6" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                Masuk dengan Google
+            </button>
+            <p id="login-error" class="text-red-500 text-xs font-bold mt-6 hidden">Akses Ditolak: Email tidak terdaftar sebagai admin.</p>
         </div>
     </div>
 
@@ -50,8 +48,15 @@
         
         <!-- Sidebar -->
         <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 overflow-y-auto no-scrollbar">
-            <div class="mb-10">
-                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-8">
+            <div class="mb-10 text-center">
+                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-8 mx-auto mb-4">
+                <div id="admin-info" class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
+                    <img id="admin-photo" src="" class="w-8 h-8 rounded-full border border-white">
+                    <div class="text-left overflow-hidden">
+                        <p id="display-admin-name" class="text-xs font-bold text-slate-800 truncate">Admin</p>
+                        <p id="display-admin-email" class="text-[9px] text-slate-400 truncate">email@admin.com</p>
+                    </div>
+                </div>
             </div>
 
             <nav class="space-y-2 flex-1">
@@ -74,7 +79,7 @@
             </nav>
 
             <div class="mt-auto pt-6 border-t border-slate-100">
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 transition-all">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 transition-all">
                     LogOut Sesi
                 </button>
             </div>
@@ -86,8 +91,7 @@
                 <h2 id="tab-title" class="text-xl font-bold text-slate-800">General Analitik</h2>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p id="display-admin-name" class="text-sm font-bold text-slate-800">Admin</p>
-                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Sesi Aktif</p>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Administrator Sesi</p>
                     </div>
                 </div>
             </header>
@@ -186,11 +190,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- KONFIGURASI FIREBASE ---
-        // Konfigurasi ini telah diperbarui sesuai dengan kredensial registrasi-user-grecia
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
             authDomain: "registrasi-user-grecia.firebaseapp.com",
@@ -203,48 +206,61 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
 
-        // LOGIN SYSTEM
-        const SESSION_TIMEOUT = 6 * 60 * 60 * 1000;
-        const loginForm = document.getElementById('login-form');
+        // Daftar email yang diizinkan sebagai admin
+        const ADMIN_EMAILS = ["admin@greciaco.id", "greciaedu.official@gmail.com"]; 
+
+        // AUTH SYSTEM
+        const btnGoogle = document.getElementById('btn-google-login');
         const screenLogin = document.getElementById('screen-login');
         const screenDashboard = document.getElementById('screen-dashboard');
+        const errorMsg = document.getElementById('login-error');
 
-        loginForm.onsubmit = (e) => {
-            e.preventDefault();
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
+        btnGoogle.onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                // Opsional: Batasi hanya email tertentu jika diperlukan
+                // if (!ADMIN_EMAILS.includes(user.email)) {
+                //    await signOut(auth);
+                //    errorMsg.classList.remove('hidden');
+                //    return;
+                // }
 
-            if(user === "admin" && pass === "grecia123") {
-                const loginData = { name: user, expiry: new Date().getTime() + SESSION_TIMEOUT };
-                localStorage.setItem('admin_session', JSON.stringify(loginData));
-                checkSession();
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                showDashboard(user);
+            } catch (error) {
+                console.error("Login Gagal:", error);
             }
         };
 
-        function checkSession() {
-            const sessionRaw = localStorage.getItem('admin_session');
-            if (sessionRaw) {
-                const session = JSON.parse(sessionRaw);
-                const now = new Date().getTime();
-                if (now < session.expiry) {
-                    screenLogin.classList.add('hidden');
-                    screenDashboard.classList.remove('hidden');
-                    document.getElementById('display-admin-name').innerText = session.name;
-                    startDataListeners();
-                } else { logout(); }
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showDashboard(user);
+            } else {
+                showLogin();
             }
+        });
+
+        function showDashboard(user) {
+            screenLogin.classList.add('hidden');
+            screenDashboard.classList.remove('hidden');
+            document.getElementById('display-admin-name').innerText = user.displayName || "Admin";
+            document.getElementById('display-admin-email').innerText = user.email;
+            document.getElementById('admin-photo').src = user.photoURL || "https://ui-avatars.com/api/?name=Admin";
+            startDataListeners();
         }
 
-        window.logout = () => {
-            localStorage.removeItem('admin_session');
-            location.reload();
-        };
+        function showLogin() {
+            screenLogin.classList.remove('hidden');
+            screenDashboard.classList.add('hidden');
+        }
 
-        setInterval(checkSession, 60000);
+        window.handleLogout = async () => {
+            await signOut(auth);
+        };
 
         // TAB SYSTEM
         window.switchTab = (tabId) => {
@@ -267,70 +283,64 @@
             if (listenersActive) return;
             listenersActive = true;
 
-            try {
-                await signInAnonymously(auth);
-                
-                const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
-                const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
-                const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list');
-                const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
+            const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
+            const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
+            const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list');
+            const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
 
-                onSnapshot(settingsDocRef, (snap) => {
-                    document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
-                }, (err) => console.error("Error settings:", err));
+            onSnapshot(settingsDocRef, (snap) => {
+                document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
+            });
 
-                onSnapshot(historyColRef, (snap) => {
-                    const list = document.getElementById('history-list');
-                    if (snap.empty) {
-                        list.innerHTML = `<div class="empty-state">Tidak ada histori pelatihan.</div>`;
-                        return;
-                    }
-                    list.innerHTML = "";
-                    snap.forEach(d => {
-                        const item = d.data();
-                        list.innerHTML += `
-                            <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center group">
-                                <div class="overflow-hidden">
-                                    <h5 class="font-bold text-xs truncate">${item.title}</h5>
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Tanggal tidak diketahui'}</p>
-                                </div>
-                                <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600 text-xs font-bold transition-colors">Hapus</button>
+            onSnapshot(historyColRef, (snap) => {
+                const list = document.getElementById('history-list');
+                if (snap.empty) {
+                    list.innerHTML = `<div class="empty-state">Tidak ada histori pelatihan.</div>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const item = d.data();
+                    list.innerHTML += `
+                        <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center group">
+                            <div class="overflow-hidden">
+                                <h5 class="font-bold text-xs truncate">${item.title}</h5>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Tanggal tidak diketahui'}</p>
                             </div>
-                        `;
-                    });
-                }, (err) => console.error("Error history:", err));
+                            <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600 text-xs font-bold transition-colors">Hapus</button>
+                        </div>
+                    `;
+                });
+            });
 
-                onSnapshot(membersColRef, (snap) => {
-                    const list = document.getElementById('member-list');
-                    document.getElementById('stat-total-members').innerText = snap.size;
-                    if (snap.empty) {
-                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada member terdaftar.</td></tr>`;
-                        return;
-                    }
-                    list.innerHTML = "";
-                    snap.forEach(d => {
-                        list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs text-slate-600">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic font-bold">Terdaftar</td></tr>`;
-                    });
-                }, (err) => console.error("Error members:", err));
+            onSnapshot(membersColRef, (snap) => {
+                const list = document.getElementById('member-list');
+                document.getElementById('stat-total-members').innerText = snap.size;
+                if (snap.empty) {
+                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada member terdaftar.</td></tr>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs text-slate-600">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic font-bold">Terdaftar</td></tr>`;
+                });
+            });
 
-                onSnapshot(attendanceColRef, (snap) => {
-                    const list = document.getElementById('attendance-list');
-                    document.getElementById('stat-total-views').innerText = snap.size;
-                    if (snap.empty) {
-                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada absensi hari ini.</td></tr>`;
-                        return;
-                    }
-                    list.innerHTML = "";
-                    snap.forEach(d => {
-                        const data = d.data();
-                        list.innerHTML += `<tr><td class="px-4 py-3 font-bold text-slate-700">${data.userName || 'Anonymous User'}</td><td class="px-4 py-3 text-slate-400 font-mono text-xs">${data.time || '-'}</td></tr>`;
-                    });
-                }, (err) => console.error("Error attendance:", err));
+            onSnapshot(attendanceColRef, (snap) => {
+                const list = document.getElementById('attendance-list');
+                document.getElementById('stat-total-views').innerText = snap.size;
+                if (snap.empty) {
+                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada absensi hari ini.</td></tr>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const data = d.data();
+                    list.innerHTML += `<tr><td class="px-4 py-3 font-bold text-slate-700">${data.userName || 'Anonymous User'}</td><td class="px-4 py-3 text-slate-400 font-mono text-xs">${data.time || '-'}</td></tr>`;
+                });
+            });
 
-                initCharts();
-            } catch (e) {
-                console.error("Firebase Auth Error:", e);
-            }
+            initCharts();
         }
 
         // CRUD Pelatihan
@@ -346,8 +356,6 @@
             const dateStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
 
             try {
-                if (!auth.currentUser) await signInAnonymously(auth);
-
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), { 
                     youtubeUrl: yt, 
                     zoomUrl: zm,
@@ -362,10 +370,9 @@
                 });
 
                 e.target.reset();
-                alert("Pelatihan berhasil dipublikasikan ke semua member!");
+                alert("Pelatihan berhasil dipublikasikan!");
             } catch (err) { 
-                console.error("Error submit:", err);
-                alert("Gagal menyimpan ke Firebase. Cek Rules Firestore atau Konfigurasi."); 
+                alert("Gagal menyimpan data."); 
             } finally { 
                 btn.disabled = false;
                 btn.innerText = "PUBLIKASIKAN"; 
@@ -373,12 +380,8 @@
         };
 
         window.deleteHistory = async (id) => {
-            if(confirm("Apakah Anda yakin ingin menghapus data histori ini?")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
-                } catch (e) {
-                    alert("Gagal menghapus.");
-                }
+            if(confirm("Hapus histori?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
             }
         };
 
@@ -398,8 +401,6 @@
                 }
             });
         }
-
-        checkSession();
     </script>
 </body>
 </html>
