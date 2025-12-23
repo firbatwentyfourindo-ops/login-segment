@@ -5,56 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | GreciaEdu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         
-        .sidebar-item { @apply flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition-all cursor-pointer uppercase tracking-wider; }
-        .sidebar-item.active { @apply bg-blue-600 text-white shadow-md; }
-        .sidebar-item.inactive { @apply text-slate-400 hover:bg-slate-200 hover:text-slate-600; }
-        
-        .glass-card { @apply bg-white border border-slate-200 rounded-xl p-4 shadow-sm; }
-        .input-slim { @apply w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 transition-all; }
-        
-        table { @apply w-full text-left text-[11px]; }
-        th { @apply bg-slate-50 p-3 text-slate-400 uppercase tracking-tighter font-bold border-b border-slate-100; }
-        td { @apply p-3 border-b border-slate-50 text-slate-600; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc;
+            color: #334155;
+        }
+
+        .sidebar-item {
+            @apply flex items-center gap-2 px-3 py-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer uppercase tracking-wider;
+        }
+        .sidebar-item.active {
+            @apply bg-blue-600 text-white shadow-lg shadow-blue-100;
+        }
+        .sidebar-item.inactive {
+            @apply text-slate-400 hover:bg-slate-100 hover:text-slate-600;
+        }
+
+        .compact-card {
+            @apply bg-white border border-slate-200 rounded-xl p-4 shadow-sm;
+        }
+
+        .data-table {
+            @apply w-full text-left text-[11px] border-collapse;
+        }
+        .data-table th {
+            @apply bg-slate-50 p-3 text-slate-400 uppercase tracking-tighter font-extrabold border-b border-slate-100;
+        }
+        .data-table td {
+            @apply p-3 border-b border-slate-50 text-slate-600 align-middle;
+        }
+
+        .input-slim {
+            @apply w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 transition-all;
+        }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .fade-in { animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        
+        #toast {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translate(-50%, 100px);
+            opacity: 0;
+        }
+        #toast.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex">
 
     <!-- Screen: Login -->
-    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
-        <div class="w-full max-w-xs bg-white rounded-3xl p-8 shadow-2xl text-center border border-slate-200">
+    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-xs bg-white rounded-[2rem] p-8 shadow-2xl text-center border border-slate-200 animate__animated animate__zoomIn">
             <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-10 mx-auto mb-6">
-            <h2 class="text-lg font-bold mb-1">Admin Portal</h2>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">GreciaEdu Management</p>
+            <h2 class="text-lg font-bold text-slate-800">Administrator</h2>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">Portal Manajemen Edukasi</p>
             
-            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-xs font-bold py-3 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+            <button id="btn-login" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-xs font-bold py-3.5 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95">
                 <svg class="w-4 h-4" viewBox="0 0 48 48">
                     <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                 </svg>
-                Masuk via Google
+                Masuk dengan Google
             </button>
-            <p id="login-error" class="text-red-500 text-[9px] font-bold mt-4 hidden uppercase">Sesi Tidak Valid</p>
         </div>
     </div>
 
     <!-- Screen: Main Dashboard -->
     <div id="screen-dashboard" class="hidden flex flex-1 h-screen overflow-hidden">
         
-        <!-- Sidebar Ramping -->
-        <aside class="w-56 bg-white border-r border-slate-200 flex flex-col p-4 shrink-0">
-            <div class="mb-8 flex items-center gap-2 px-2">
-                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" class="h-6">
-                <span class="text-[10px] font-extrabold text-blue-600 tracking-tighter">ADMIN</span>
+        <!-- Sidebar -->
+        <aside class="w-60 bg-white border-r border-slate-200 flex flex-col p-5 shrink-0">
+            <div class="mb-10 flex items-center gap-3 px-1">
+                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" class="h-7">
+                <div class="h-4 w-[1px] bg-slate-200"></div>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Admin</span>
             </div>
 
-            <nav class="space-y-1 flex-1">
+            <nav class="space-y-1.5 flex-1">
                 <div onclick="switchTab('general')" id="nav-general" class="sidebar-item active">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path></svg>
                     General
@@ -64,7 +95,7 @@
                     Viewers
                 </div>
                 <div onclick="switchTab('members')" id="nav-members" class="sidebar-item inactive">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Members
                 </div>
                 <div onclick="switchTab('connect')" id="nav-connect" class="sidebar-item inactive">
@@ -73,114 +104,129 @@
                 </div>
             </nav>
 
-            <div class="pt-4 border-t border-slate-100">
-                <div class="flex items-center gap-2 mb-4 px-2">
-                    <img id="admin-photo" src="" class="w-6 h-6 rounded-full border border-slate-200">
+            <div class="pt-5 border-t border-slate-100 mt-auto">
+                <div class="flex items-center gap-2 mb-5 px-1">
+                    <img id="admin-photo" src="" class="w-7 h-7 rounded-full border border-slate-200">
                     <div class="overflow-hidden">
-                        <p id="admin-name" class="text-[9px] font-bold text-slate-700 truncate">Admin</p>
+                        <p id="admin-name" class="text-[10px] font-bold text-slate-700 truncate">Admin Grecia</p>
                     </div>
                 </div>
-                <button onclick="handleLogout()" class="sidebar-item text-red-500 hover:bg-red-50 hover:text-red-600 w-full">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <button onclick="handleLogout()" class="sidebar-item text-red-500 hover:bg-red-50 hover:text-red-600 w-full group">
+                    <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Logout
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+        <main class="flex-1 flex flex-col overflow-hidden bg-[#fafbfc]">
             <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <h2 id="page-title" class="text-xs font-extrabold text-slate-800 uppercase tracking-tighter">General Overview</h2>
-                <div id="countdown" class="text-[9px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 uppercase tracking-widest">Sesi Valid: ...</div>
+                <div class="flex items-center gap-3">
+                    <div id="status-indicator" class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <h2 id="page-title" class="text-[11px] font-extrabold text-slate-800 uppercase tracking-widest">General Dashboard</h2>
+                </div>
+                <div id="session-timer" class="text-[9px] font-bold text-slate-400 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                    Sesi Berakhir: --:--
+                </div>
             </header>
 
             <div id="content-area" class="flex-1 overflow-y-auto p-6 no-scrollbar">
                 
                 <!-- Tab: General -->
-                <section id="tab-general" class="fade-in space-y-4">
+                <section id="tab-general" class="animate__animated animate__fadeIn space-y-5">
                     <div class="grid grid-cols-4 gap-4">
-                        <div class="glass-card">
+                        <div class="compact-card">
                             <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Total Viewers</p>
-                            <h3 id="stat-viewers" class="text-xl font-bold">0</h3>
+                            <h3 id="stat-viewers" class="text-xl font-extrabold text-slate-800">0</h3>
                         </div>
-                        <div class="glass-card">
+                        <div class="compact-card">
                             <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Total Members</p>
-                            <h3 id="stat-members" class="text-xl font-bold">0</h3>
+                            <h3 id="stat-members" class="text-xl font-extrabold text-slate-800">0</h3>
                         </div>
-                        <div class="glass-card">
-                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Histori Koneksi</p>
-                            <h3 id="stat-history" class="text-xl font-bold">0</h3>
+                        <div class="compact-card">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Total Connect</p>
+                            <h3 id="stat-history" class="text-xl font-extrabold text-slate-800">0</h3>
                         </div>
-                        <div class="glass-card">
-                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Uptime Sistem</p>
-                            <h3 class="text-xl font-bold text-green-500">Live</h3>
+                        <div class="compact-card">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Data Health</p>
+                            <h3 class="text-xl font-extrabold text-blue-600">Stable</h3>
                         </div>
                     </div>
-                    <div class="glass-card min-h-[200px] flex items-center justify-center text-slate-300 text-[10px] font-bold uppercase tracking-[0.2em]">
-                        Statistik Grafik Data Terintegrasi
+                    
+                    <!-- Mode Baca Ringkasan -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="compact-card min-h-[150px]">
+                            <h4 class="text-[10px] font-black uppercase text-slate-400 mb-3">Ringkasan Viewer Terkini</h4>
+                            <div id="summary-viewers" class="space-y-2"></div>
+                        </div>
+                        <div class="compact-card min-h-[150px]">
+                            <h4 class="text-[10px] font-black uppercase text-slate-400 mb-3">Member Baru Diterima</h4>
+                            <div id="summary-members" class="space-y-2"></div>
+                        </div>
                     </div>
                 </section>
 
                 <!-- Tab: Viewers -->
-                <section id="tab-viewers" class="hidden fade-in space-y-4">
-                    <div class="glass-card overflow-hidden !p-0">
-                        <table>
+                <section id="tab-viewers" class="hidden animate__animated animate__fadeIn">
+                    <div class="compact-card !p-0 overflow-hidden">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Nama Peserta</th>
-                                    <th>Email</th>
-                                    <th>Waktu Hadir</th>
-                                    <th>Status</th>
+                                    <th>Peserta</th>
+                                    <th>Kontak / Email</th>
+                                    <th>Waktu Kehadiran</th>
+                                    <th class="text-right">Aktivitas</th>
                                 </tr>
                             </thead>
-                            <tbody id="viewer-list"></tbody>
+                            <tbody id="viewer-table-body"></tbody>
                         </table>
                     </div>
                 </section>
 
                 <!-- Tab: Members -->
-                <section id="tab-members" class="hidden fade-in space-y-4">
-                    <div class="glass-card overflow-hidden !p-0">
-                        <table>
+                <section id="tab-members" class="hidden animate__animated animate__fadeIn">
+                    <div class="compact-card !p-0 overflow-hidden">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Nama Lengkap</th>
-                                    <th>Email</th>
-                                    <th>Domisili</th>
-                                    <th>Sumber Info</th>
-                                    <th>Tgl Daftar</th>
+                                    <th>Data Member</th>
+                                    <th>Asal Kota</th>
+                                    <th>Referensi</th>
+                                    <th>Terdaftar Pada</th>
                                 </tr>
                             </thead>
-                            <tbody id="member-list"></tbody>
+                            <tbody id="member-table-body"></tbody>
                         </table>
                     </div>
                 </section>
 
                 <!-- Tab: Connect -->
-                <section id="tab-connect" class="hidden fade-in grid grid-cols-12 gap-6">
-                    <div class="col-span-4 space-y-4">
-                        <div class="glass-card">
-                            <h4 class="text-[10px] font-extrabold mb-4 uppercase text-blue-600">Update Sesi Baru</h4>
-                            <form id="connect-form" class="space-y-3">
-                                <input type="text" id="c-title" placeholder="Judul Pelatihan" required class="input-slim">
-                                <input type="url" id="c-yt" placeholder="Link YouTube Baru" required class="input-slim">
-                                <input type="url" id="c-zm" placeholder="Link Zoom Baru" required class="input-slim">
-                                <button type="submit" class="w-full bg-slate-900 text-white text-[10px] font-bold py-3 rounded-lg hover:bg-blue-600 transition-all uppercase tracking-widest">Publish Link</button>
+                <section id="tab-connect" class="hidden animate__animated animate__fadeIn grid grid-cols-12 gap-6">
+                    <!-- Form Create -->
+                    <div class="col-span-4">
+                        <div class="compact-card">
+                            <h4 class="text-[11px] font-black uppercase text-blue-600 mb-4 tracking-wider">Publikasi Pelatihan</h4>
+                            <form id="form-connect" class="space-y-3">
+                                <input type="text" id="c-title" placeholder="Nama Pelatihan Baru" required class="input-slim">
+                                <input type="url" id="c-yt" placeholder="URL Live YouTube" required class="input-slim">
+                                <input type="url" id="c-zm" placeholder="URL Room Zoom" required class="input-slim">
+                                <button type="submit" class="w-full bg-slate-900 text-white text-[10px] font-bold py-3 rounded-lg hover:bg-blue-600 transition-all uppercase tracking-widest shadow-lg shadow-slate-100">Update Link Sekarang</button>
                             </form>
                         </div>
                     </div>
+                    <!-- History List -->
                     <div class="col-span-8">
-                        <div class="glass-card overflow-hidden !p-0">
-                            <table>
+                        <div class="compact-card !p-0 overflow-hidden">
+                            <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Judul & Tanggal</th>
                                         <th>YouTube</th>
                                         <th>Zoom</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="history-list"></tbody>
+                                <tbody id="history-table-body"></tbody>
                             </table>
                         </div>
                     </div>
@@ -188,6 +234,11 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl z-[100]">
+        Notifikasi Sistem
     </div>
 
     <script type="module">
@@ -210,110 +261,141 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
 
-        const SESSION_TIMEOUT = 6 * 60 * 60 * 1000; // 6 Jam
+        const SESSION_LIMIT = 6 * 60 * 60 * 1000; // 6 Jam
 
-        // --- AUTH & AUTO LOGOUT ---
-        const checkSession = () => {
-            const loginTime = localStorage.getItem('admin_login_time');
-            if (loginTime && (Date.now() - parseInt(loginTime) > SESSION_TIMEOUT)) {
-                handleLogout();
+        // --- SESSION MANAGEMENT ---
+        function checkSession() {
+            const loginTime = localStorage.getItem('grecia_admin_login');
+            if (loginTime) {
+                const diff = Date.now() - parseInt(loginTime);
+                if (diff > SESSION_LIMIT) {
+                    handleLogout();
+                    return;
+                }
+                updateTimerDisplay(SESSION_LIMIT - diff);
             }
-        };
+        }
 
-        setInterval(checkSession, 60000); // Cek tiap menit
+        function updateTimerDisplay(ms) {
+            const h = Math.floor(ms / (1000 * 60 * 60));
+            const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('session-timer').innerText = `Sesi Berakhir: ${h}j ${m}m`;
+        }
 
+        setInterval(checkSession, 60000);
+
+        // --- AUTH ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (!localStorage.getItem('admin_login_time')) {
-                    localStorage.setItem('admin_login_time', Date.now().toString());
+                if (!localStorage.getItem('grecia_admin_login')) {
+                    localStorage.setItem('grecia_admin_login', Date.now().toString());
                 }
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-dashboard').classList.remove('hidden');
                 document.getElementById('admin-photo').src = user.photoURL;
                 document.getElementById('admin-name').innerText = user.displayName;
-                initData();
+                startRealtimeData();
             } else {
                 document.getElementById('screen-login').classList.remove('hidden');
                 document.getElementById('screen-dashboard').classList.add('hidden');
-                localStorage.removeItem('admin_login_time');
+                localStorage.removeItem('grecia_admin_login');
             }
         });
 
-        document.getElementById('btn-google-login').onclick = () => signInWithPopup(auth, provider);
+        document.getElementById('btn-login').onclick = () => signInWithPopup(auth, provider);
+        window.handleLogout = () => signOut(auth);
 
-        window.handleLogout = () => {
-            localStorage.removeItem('admin_login_time');
-            signOut(auth);
-        };
-
-        // --- TAB NAVIGATION ---
+        // --- NAVIGATION ---
         window.switchTab = (id) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`tab-${id}`).classList.remove('hidden');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.replace('active', 'inactive'));
             document.getElementById(`nav-${id}`).classList.replace('inactive', 'active');
-            document.getElementById('page-title').innerText = id.charAt(0).toUpperCase() + id.slice(1) + " Management";
+            document.getElementById('page-title').innerText = id + " Dashboard";
         };
 
-        // --- DATA SYNC ---
-        function initData() {
-            // Stats: Viewers
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // --- REALTIME DATA ---
+        function startRealtimeData() {
+            // VIEWERS SYNC (Attendance)
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
-                document.getElementById('stat-viewers').innerText = snap.size;
-                const list = document.getElementById('viewer-list');
-                list.innerHTML = "";
+                const count = snap.size;
+                document.getElementById('stat-viewers').innerText = count;
+                const tbody = document.getElementById('viewer-table-body');
+                const summary = document.getElementById('summary-viewers');
+                tbody.innerHTML = "";
+                summary.innerHTML = "";
+                
+                let i = 0;
                 snap.forEach(d => {
                     const it = d.data();
-                    list.innerHTML += `<tr>
+                    const row = `<tr>
                         <td class="font-bold text-slate-800">${it.userName}</td>
-                        <td class="text-slate-400">${it.userEmail}</td>
-                        <td class="font-mono text-blue-600">${it.time || '-'}</td>
-                        <td><span class="bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-[8px] font-bold">ONLINE</span></td>
+                        <td class="text-slate-400 font-medium">${it.userEmail}</td>
+                        <td class="text-blue-600 font-bold">${it.time || 'Baru'}</td>
+                        <td class="text-right"><span class="bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-[8px] font-black uppercase">Click</span></td>
                     </tr>`;
+                    tbody.innerHTML += row;
+                    if(i < 3) summary.innerHTML += `<p class="text-[10px] border-l-2 border-blue-500 pl-2"><b>${it.userName}</b> hadir jam ${it.time || '-'}</p>`;
+                    i++;
                 });
             });
 
-            // Stats: Members
+            // MEMBERS SYNC (Registrations)
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), (snap) => {
                 document.getElementById('stat-members').innerText = snap.size;
-                const list = document.getElementById('member-list');
-                list.innerHTML = "";
+                const tbody = document.getElementById('member-table-body');
+                const summary = document.getElementById('summary-members');
+                tbody.innerHTML = "";
+                summary.innerHTML = "";
+                
+                let i = 0;
                 snap.forEach(d => {
                     const it = d.data();
                     const date = it.submittedAt?.toDate().toLocaleDateString('id-ID') || '-';
-                    list.innerHTML += `<tr>
-                        <td class="font-bold text-slate-800">${it.fullName}</td>
-                        <td class="text-slate-400">${it.email}</td>
-                        <td class="text-slate-500">${it.address}</td>
-                        <td class="font-bold text-slate-400 uppercase">${it.referralSource}</td>
+                    const row = `<tr>
+                        <td><p class="font-bold text-slate-800">${it.fullName}</p><p class="text-[9px] text-slate-400 font-medium">${it.email}</p></td>
+                        <td class="font-bold text-slate-400 uppercase tracking-tighter">${it.address || '-'}</td>
+                        <td class="text-slate-400 font-bold">${it.referralSource || '-'}</td>
                         <td class="text-[10px] font-mono">${date}</td>
                     </tr>`;
+                    tbody.innerHTML += row;
+                    if(i < 3) summary.innerHTML += `<p class="text-[10px] border-l-2 border-green-500 pl-2"><b>${it.fullName}</b> dari ${it.address || 'Kota'}</p>`;
+                    i++;
                 });
             });
 
-            // Stats: History Connect
+            // CONNECT SYNC (History)
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'history'), (snap) => {
                 document.getElementById('stat-history').innerText = snap.size;
-                const list = document.getElementById('history-list');
-                list.innerHTML = "";
+                const tbody = document.getElementById('history-table-body');
+                tbody.innerHTML = "";
                 snap.forEach(d => {
                     const it = d.data();
-                    list.innerHTML += `<tr>
-                        <td><p class="font-bold text-slate-800">${it.title}</p><p class="text-[9px] text-slate-400">${it.date}</p></td>
-                        <td><a href="${it.youtubeUrl}" target="_blank" class="text-red-500 font-bold hover:underline">YT Link</a></td>
-                        <td><a href="${it.zoomUrl}" target="_blank" class="text-blue-500 font-bold hover:underline">ZM Link</a></td>
-                        <td><button onclick="deleteEntry('${d.id}')" class="text-slate-300 hover:text-red-500"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></button></td>
+                    const row = `<tr>
+                        <td><p class="font-bold text-slate-800 leading-tight">${it.title}</p><p class="text-[9px] text-slate-400 font-bold">${it.date}</p></td>
+                        <td><a href="${it.youtubeUrl}" target="_blank" class="text-red-500 font-bold hover:underline">Streaming</a></td>
+                        <td><a href="${it.zoomUrl}" target="_blank" class="text-blue-500 font-bold hover:underline">Meeting</a></td>
+                        <td class="text-center">
+                            <button onclick="window.deleteItem('${d.id}')" class="text-slate-300 hover:text-red-500 transition-colors">
+                                <svg class="w-4 h-4 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            </button>
+                        </td>
                     </tr>`;
+                    tbody.innerHTML += row;
                 });
             });
         }
 
-        // --- FORM CONNECT ---
-        document.getElementById('connect-form').onsubmit = async (e) => {
+        // --- FORM ACTION ---
+        document.getElementById('form-connect').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.innerText = "PUBLISHING...";
-            
             const payload = {
                 title: document.getElementById('c-title').value,
                 youtubeUrl: document.getElementById('c-yt').value,
@@ -322,41 +404,30 @@
             };
 
             try {
-                // Update link aktif (untuk user dashboard)
+                // Update Link Global
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), {
                     youtubeUrl: payload.youtubeUrl,
                     zoomUrl: payload.zoomUrl,
                     updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                // Simpan ke history
+                // Add to History
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), {
                     ...payload,
                     createdAt: serverTimestamp()
                 });
 
                 e.target.reset();
+                showToast("Link Terupdate");
             } catch (err) { console.error(err); }
-            btn.innerText = "PUBLISH LINK";
         };
 
-        window.deleteEntry = async (id) => {
-            if (confirm("Hapus histori koneksi ini?")) {
+        window.deleteItem = async (id) => {
+            if(confirm("Hapus histori pelatihan ini?")) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
+                showToast("Data Terhapus");
             }
         };
-
-        // --- COUNTDOWN DISPLAY ---
-        setInterval(() => {
-            const loginTime = localStorage.getItem('admin_login_time');
-            const cd = document.getElementById('countdown');
-            if (loginTime) {
-                const diff = SESSION_TIMEOUT - (Date.now() - parseInt(loginTime));
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                cd.innerText = `Sesi: ${hours}j ${mins}m lagi`;
-            }
-        }, 10000);
     </script>
 </body>
 </html>
