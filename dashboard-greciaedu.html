@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard GreciaEdu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            background-image: radial-gradient(at 0% 0%, hsla(210,100%,99%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 100%, hsla(210,100%,99%,1) 0, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .minimal-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #f3f4f6;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #2563eb;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: #2563eb;
+            border-radius: 10px;
+        }
+
+        .video-preview {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f9fafb;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #f9fafb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .btn-action {
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="w-full max-w-sm animate__animated animate__fadeIn">
+        <!-- Logo -->
+        <div class="text-center mb-6">
+            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo Grecia" class="h-10 mx-auto">
+        </div>
+
+        <div class="minimal-card rounded-[2rem] p-5">
+            <!-- Navigasi Tab -->
+            <div class="flex border-b border-gray-100 mb-6">
+                <button onclick="window.switchTab('youtube')" id="tab-yt" class="tab-btn active flex-1 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">YouTube</button>
+                <button onclick="window.switchTab('zoom')" id="tab-zm" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">Zoom</button>
+            </div>
+
+            <!-- Status Loading Data -->
+            <div id="data-loader" class="py-10 text-center">
+                <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Menghubungkan ke Server...</p>
+            </div>
+
+            <!-- Konten Tab YouTube -->
+            <div id="content-youtube" class="hidden tab-content animate__animated animate__fadeIn">
+                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative group">
+                    <div id="yt-skeleton" class="skeleton absolute inset-0"></div>
+                    <img id="yt-thumb" src="" class="hidden w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/5 flex items-center justify-center">
+                         <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
+                            <svg class="w-4 h-4 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <a id="link-yt" href="#" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3.5 rounded-xl font-bold text-xs shadow-lg shadow-red-100">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
+                    LINK STREAMING YOUTUBE
+                </a>
+            </div>
+
+            <!-- Konten Tab Zoom -->
+            <div id="content-zoom" class="hidden tab-content animate__animated animate__fadeIn">
+                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative">
+                    <img id="zm-thumb" src="" class="w-full h-full object-cover opacity-60 grayscale-[0.5]">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-blue-50/20 p-4 text-center">
+                        <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md mb-2">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="text-[10px] font-bold text-blue-900 uppercase">Ruang Meeting Zoom</span>
+                    </div>
+                </div>
+                <a id="link-zm" href="#" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3.5 rounded-xl font-bold text-xs shadow-lg shadow-blue-100">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5V7.5L16 12L21 16.5ZM4 7C2.89543 7 2 7.89543 2 9V15C2 16.1046 2.89543 17 4 17H12C13.1046 17 14 16.1046 14 15V9C14 7.89543 13.1046 7 12 7H4Z"></path></svg>
+                    LINK STREAMING ZOOM
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center">
+            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-[0.4em]">greciaEdu &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi dari Environment
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        let activeTab = 'youtube';
+
+        // Fungsi Global untuk pindah Tab
+        window.switchTab = (type) => {
+            activeTab = type;
+            renderTabs();
+        };
+
+        function renderTabs() {
+            const ytContent = document.getElementById('content-youtube');
+            const zmContent = document.getElementById('content-zoom');
+            const ytTab = document.getElementById('tab-yt');
+            const zmTab = document.getElementById('tab-zm');
+            const loader = document.getElementById('data-loader');
+
+            // Sembunyikan loader jika sudah ada data
+            if (loader) loader.classList.add('hidden');
+
+            if(activeTab === 'youtube') {
+                ytContent.classList.remove('hidden');
+                zmContent.classList.add('hidden');
+                ytTab.classList.add('active');
+                zmTab.classList.remove('active');
+            } else {
+                ytContent.classList.add('hidden');
+                zmContent.classList.remove('hidden');
+                ytTab.classList.remove('active');
+                zmTab.classList.add('active');
+            }
+        }
+
+        function getYoutubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url?.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function updateThumbnail(url) {
+            const videoId = getYoutubeId(url);
+            const ytThumb = document.getElementById('yt-thumb');
+            const zmThumb = document.getElementById('zm-thumb');
+            const skeleton = document.getElementById('yt-skeleton');
+
+            if (videoId) {
+                const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                const img = new Image();
+                img.onload = () => {
+                    ytThumb.src = thumbUrl;
+                    zmThumb.src = thumbUrl;
+                    ytThumb.classList.remove('hidden');
+                    if (skeleton) skeleton.classList.add('hidden');
+                };
+                img.onerror = () => {
+                    const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                    ytThumb.src = fallback;
+                    zmThumb.src = fallback;
+                    ytThumb.classList.remove('hidden');
+                    if (skeleton) skeleton.classList.add('hidden');
+                };
+                img.src = thumbUrl;
+            }
+        }
+
+        // Jalankan Auth & Ambil Data
+        const init = async () => {
+            // Rule 3: Pastikan Auth selesai dulu
+            try {
+                // Gunakan await untuk memastikan sign-in selesai sebelum lanjut ke query
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Auth failed:", err);
+            }
+
+            // Monitor state perubahan auth
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+
+                // Rule 1: Gunakan path yang tepat
+                // Koleksi: artifacts -> {appId} -> public -> data -> {documentName}
+                const linksDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings');
+                
+                // onSnapshot dengan callback error untuk debugging
+                onSnapshot(linksDoc, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        
+                        // Update Link Tombol
+                        document.getElementById('link-yt').href = data.youtubeUrl || '#';
+                        document.getElementById('link-zm').href = data.zoomUrl || '#';
+                        
+                        // Update Thumbnail
+                        updateThumbnail(data.youtubeUrl);
+                        
+                        // Tampilkan UI
+                        renderTabs();
+                    } else {
+                        console.warn("Dokumen 'settings' tidak ditemukan. Pastikan data ada di: /artifacts/" + appId + "/public/data/settings");
+                        renderTabs(); 
+                    }
+                }, (error) => {
+                    console.error("Firestore Permission Error:", error);
+                    const loaderText = document.querySelector('#data-loader p');
+                    if (loaderText) loaderText.innerText = "Error: Izin Ditolak / Database Belum Siap.";
+                });
+            });
+        };
+
+        init();
+    </script>
+</body>
+</html>
