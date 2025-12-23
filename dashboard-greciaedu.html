@@ -3,175 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard GreciaEdu</title>
+    <title>Admin Dashboard - Event Grecia</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #ffffff;
-            background-image: radial-gradient(at 0% 0%, hsla(210,100%,99%,1) 0, transparent 50%), 
-                              radial-gradient(at 100% 100%, hsla(210,100%,99%,1) 0, transparent 50%);
-            min-height: 100vh;
-        }
-
-        .minimal-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
-        }
-
-        .tab-btn {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            color: #2563eb;
-        }
-
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 25%;
-            width: 50%;
-            height: 2px;
-            background: #2563eb;
-            border-radius: 10px;
-        }
-
-        .video-preview {
-            border-radius: 16px;
-            overflow: hidden;
-            background: #f9fafb;
-            aspect-ratio: 16 / 9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, #f3f4f6 25%, #f9fafb 50%, #f3f4f6 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .btn-action {
-            transition: all 0.2s ease;
-        }
-
-        .btn-action:active {
-            transform: scale(0.98);
-        }
-
-        #toast {
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform: translateY(100px);
-            opacity: 0;
-        }
-        #toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    </style>
-</head>
-<body class="p-4 flex items-center justify-center">
-
-    <!-- Konten Utama Dashboard -->
-    <div id="main-container" class="w-full max-w-sm hidden animate__animated animate__fadeIn">
-        <!-- Header & Profile -->
-        <div class="flex items-center justify-between mb-6">
-            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo Grecia" class="h-8">
-            <div id="user-profile" class="flex items-center gap-2 bg-white/50 p-1 pr-3 rounded-full border border-gray-100">
-                <img id="user-avatar" src="" class="w-7 h-7 rounded-full object-cover border border-white">
-                <span id="user-name" class="text-[10px] font-bold text-gray-600 truncate max-w-[80px]">User</span>
-            </div>
-        </div>
-
-        <div class="minimal-card rounded-[2.5rem] p-5">
-            <!-- Navigasi Tab -->
-            <div class="flex border-b border-gray-100 mb-6">
-                <button onclick="window.switchTab('youtube')" id="tab-yt" class="tab-btn active flex-1 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">YouTube</button>
-                <button onclick="window.switchTab('zoom')" id="tab-zm" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">Zoom</button>
-            </div>
-
-            <!-- Status Loading Data -->
-            <div id="data-loader" class="py-10 text-center">
-                <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase">Sinkronisasi Sesi...</p>
-            </div>
-
-            <!-- Konten Tab YouTube -->
-            <div id="content-youtube" class="hidden tab-content animate__animated animate__fadeIn">
-                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative group">
-                    <div id="yt-skeleton" class="skeleton absolute inset-0"></div>
-                    <img id="yt-thumb" src="" class="hidden w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/5 flex items-center justify-center">
-                         <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
-                            <svg class="w-4 h-4 text-red-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                        </div>
-                    </div>
-                </div>
-                <a id="link-yt" href="#" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-red-600 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-red-100">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
-                    MASUK STREAMING YOUTUBE
-                </a>
-            </div>
-
-            <!-- Konten Tab Zoom -->
-            <div id="content-zoom" class="hidden tab-content animate__animated animate__fadeIn">
-                <div class="video-preview mb-5 shadow-sm border border-gray-50 relative">
-                    <img id="zm-thumb" src="" class="w-full h-full object-cover opacity-40 grayscale">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-blue-50/10 p-4 text-center">
-                        <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg mb-3">
-                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <span class="text-[11px] font-extrabold text-blue-900 uppercase tracking-widest">Ruang Interaktif Zoom</span>
-                    </div>
-                </div>
-                <a id="link-zm" href="#" target="_blank" class="btn-action w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-2xl font-bold text-[11px] shadow-lg shadow-blue-100">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5V7.5L16 12L21 16.5ZM4 7C2.89543 7 2 7.89543 2 9V15C2 16.1046 2.89543 17 4 17H12C13.1046 17 14 16.1046 14 15V9C14 7.89543 13.1046 7 12 7H4Z"></path></svg>
-                    GABUNG MEETING ZOOM
-                </a>
-            </div>
-        </div>
-
-        <button onclick="window.logout()" class="mt-6 w-full text-center text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">
-            Keluar dari Sesi
-        </button>
-
-        <footer class="mt-8 text-center">
-            <p class="text-[9px] text-gray-300 font-bold uppercase tracking-[0.4em]">greciaEdu &copy; 2025</p>
-        </footer>
-    </div>
-
-    <!-- State: Not Authenticated / Logout -->
-    <div id="logged-out-view" class="hidden flex flex-col items-center justify-center animate__animated animate__fadeIn">
-        <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo Grecia" class="h-10 mb-8 opacity-20 grayscale">
-        <div class="text-center space-y-4">
-            <h2 class="text-xl font-bold text-slate-800">Sesi Berakhir</h2>
-            <p class="text-xs text-slate-500 max-w-xs mx-auto">Silakan gunakan halaman utama untuk masuk kembali ke sistem dashboard GreciaEdu.</p>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-2xl z-50">
-        Sesi Terhubung
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, onSnapshot, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
@@ -185,132 +22,265 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
+        const appId = firebaseConfig.appId;
 
-        let activeTab = 'youtube';
+        // DAFTAR ADMIN (Whitelist)
+        // Dalam produksi, sebaiknya gunakan Custom Claims atau koleksi khusus 'admins'
+        const ADMIN_WHITELIST = ["admin@grecia.com", "your-email@gmail.com"];
 
-        // Tampilkan Toast
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            t.innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+        const mainContent = document.getElementById('main-content');
+        const accessDenied = document.getElementById('access-denied');
+        const loading = document.getElementById('loading');
 
-        window.switchTab = (type) => {
-            activeTab = type;
-            renderTabs();
-        };
+        let activeSessionId = "session_default";
 
-        window.logout = () => {
-            signOut(auth);
-        };
-
-        function renderTabs() {
-            const ytContent = document.getElementById('content-youtube');
-            const zmContent = document.getElementById('content-zoom');
-            const ytTab = document.getElementById('tab-yt');
-            const zmTab = document.getElementById('tab-zm');
-            const loader = document.getElementById('data-loader');
-
-            if (loader) loader.classList.add('hidden');
-
-            if(activeTab === 'youtube') {
-                if(ytContent) ytContent.classList.remove('hidden');
-                if(zmContent) zmContent.classList.add('hidden');
-                if(ytTab) ytTab.classList.add('active');
-                if(zmTab) zmTab.classList.remove('active');
+        // 1. Verifikasi Admin & Proteksi Halaman
+        onAuthStateChanged(auth, async (user) => {
+            if (user && ADMIN_WHITELIST.includes(user.email)) {
+                loading.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                initAdminDashboard();
             } else {
-                if(ytContent) ytContent.classList.add('hidden');
-                if(zmContent) zmContent.classList.remove('hidden');
-                if(ytTab) ytTab.classList.remove('active');
-                if(zmTab) zmTab.classList.add('active');
-            }
-        }
-
-        function getYoutubeId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url?.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        function updateThumbnail(url) {
-            const videoId = getYoutubeId(url);
-            const ytThumb = document.getElementById('yt-thumb');
-            const zmThumb = document.getElementById('zm-thumb');
-            const skeleton = document.getElementById('yt-skeleton');
-
-            if (videoId) {
-                const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                const img = new Image();
-                img.onload = () => {
-                    if(ytThumb) {
-                        ytThumb.src = thumbUrl;
-                        ytThumb.classList.remove('hidden');
-                    }
-                    if(zmThumb) zmThumb.src = thumbUrl;
-                    if (skeleton) skeleton.classList.add('hidden');
-                };
-                img.src = thumbUrl;
-            }
-        }
-
-        // Catat Absensi Kehadiran
-        async function markAttendance(user) {
-            try {
-                const attendanceRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', user.uid);
-                await setDoc(attendanceRef, {
-                    userName: user.displayName || 'Peserta',
-                    userEmail: user.email,
-                    timestamp: serverTimestamp(),
-                    time: new Date().toLocaleTimeString('id-ID')
-                }, { merge: true });
-                console.log("Attendance recorded");
-            } catch (e) {
-                console.error("Error recording attendance:", e);
-            }
-        }
-
-        // Jalankan Auth Listener
-        onAuthStateChanged(auth, (user) => {
-            const mainContainer = document.getElementById('main-container');
-            const loggedOutView = document.getElementById('logged-out-view');
-
-            if (user) {
-                // Tampilkan Dashboard
-                mainContainer.classList.remove('hidden');
-                loggedOutView.classList.add('hidden');
-                
-                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`;
-                document.getElementById('user-name').innerText = user.displayName?.split(' ')[0] || 'User';
-
-                // Real-time Settings
-                const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
-                
-                onSnapshot(settingsDoc, (snapshot) => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.data();
-                        document.getElementById('link-yt').href = data.youtubeUrl || '#';
-                        document.getElementById('link-zm').href = data.zoomUrl || '#';
-                        updateThumbnail(data.youtubeUrl);
-                        renderTabs();
-                    } else {
-                        renderTabs(); 
-                    }
-                }, (error) => {
-                    showToast("Error Koneksi Database");
-                });
-
-                // Catat kehadiran
-                markAttendance(user);
-                showToast("Sesi Aktif");
-            } else {
-                // Tampilkan pesan logout alih-alih navigasi href
-                mainContainer.classList.add('hidden');
-                loggedOutView.classList.remove('hidden');
+                loading.classList.add('hidden');
+                accessDenied.classList.remove('hidden');
             }
         });
+
+        function initAdminDashboard() {
+            loadGlobalSettings();
+            listenToRegistrations();
+            listenToAttendance();
+        }
+
+        // 2. Monitoring Pengaturan Sesi (Global Settings)
+        async function loadGlobalSettings() {
+            const settingsRef = doc(db, `artifacts/${appId}/public/data/global`, "settings");
+            onSnapshot(settingsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    activeSessionId = data.sessionId;
+                    document.getElementById('current-session-display').innerText = activeSessionId;
+                    document.getElementById('yt-link-input').value = data.youtubeUrl || "";
+                    document.getElementById('zoom-link-input').value = data.zoomUrl || "";
+                }
+            });
+        }
+
+        // 3. Update Sesi & Link (Hanya Admin yang Bisa Menulis ke Global)
+        window.updateSession = async () => {
+            const newSession = document.getElementById('session-id-input').value;
+            const ytLink = document.getElementById('yt-link-input').value;
+            const zoomLink = document.getElementById('zoom-link-input').value;
+
+            if (!newSession) return alert("Session ID wajib diisi!");
+
+            try {
+                await setDoc(doc(db, `artifacts/${appId}/public/data/global`, "settings"), {
+                    sessionId: newSession,
+                    youtubeUrl: ytLink,
+                    zoomUrl: zoomLink,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                alert("Sesi Berhasil Diperbarui!");
+            } catch (e) {
+                alert("Error: " + e.message);
+            }
+        };
+
+        // 4. Listen Data Registrasi (Realtime)
+        function listenToRegistrations() {
+            const regRef = collection(db, `artifacts/${appId}/public/data/registrations`);
+            onSnapshot(regRef, (snapshot) => {
+                const listBody = document.getElementById('registration-list');
+                listBody.innerHTML = "";
+                
+                document.getElementById('total-registrants').innerText = snapshot.size;
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = `
+                        <tr class="border-b hover:bg-slate-50 transition">
+                            <td class="p-3 text-sm font-medium text-slate-700">${data.fullName || '-'}</td>
+                            <td class="p-3 text-sm text-slate-600">${data.email || '-'}</td>
+                            <td class="p-3 text-sm text-slate-600">${data.method || '-'}</td>
+                            <td class="p-3 text-sm text-slate-500">${data.submittedAt?.toDate().toLocaleString('id-ID') || '-'}</td>
+                        </tr>
+                    `;
+                    listBody.innerHTML += row;
+                });
+            });
+        }
+
+        // 5. Listen Data Absensi (Realtime)
+        function listenToAttendance() {
+            const attRef = collection(db, `artifacts/${appId}/public/data/attendance`);
+            onSnapshot(attRef, (snapshot) => {
+                const listBody = document.getElementById('attendance-list');
+                listBody.innerHTML = "";
+                
+                // Filter di frontend untuk performa sederhana (Rule 2 Firestore)
+                const currentSessionData = snapshot.docs
+                    .map(d => d.data())
+                    .filter(d => d.sessionId === activeSessionId);
+
+                document.getElementById('total-attendance').innerText = currentSessionData.length;
+
+                currentSessionData.forEach((data) => {
+                    const row = `
+                        <tr class="border-b hover:bg-green-50 transition">
+                            <td class="p-3 text-sm font-bold text-indigo-600">${data.userName || 'User'}</td>
+                            <td class="p-3 text-sm text-slate-600">${data.channel || 'Live'}</td>
+                            <td class="p-3 text-sm text-slate-500">${data.clickedAt?.toDate().toLocaleString('id-ID') || '-'}</td>
+                            <td class="p-3 text-sm text-slate-400 font-mono text-xs">${data.uid}</td>
+                        </tr>
+                    `;
+                    listBody.innerHTML += row;
+                });
+            });
+        }
+
+        window.logout = () => signOut(auth).then(() => window.location.reload());
+
     </script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans">
+
+    <!-- Loading State -->
+    <div id="loading" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p class="mt-4 text-slate-500 font-medium tracking-wide">Memverifikasi Admin...</p>
+        </div>
+    </div>
+
+    <!-- Access Denied -->
+    <div id="access-denied" class="hidden fixed inset-0 bg-white z-50 flex items-center justify-center p-6 text-center">
+        <div class="max-w-sm">
+            <div class="text-red-500 text-6xl mb-4">🚫</div>
+            <h1 class="text-2xl font-bold text-slate-800">Akses Ditolak</h1>
+            <p class="text-slate-500 mt-2">Halaman ini hanya untuk administrator resmi Event Grecia.</p>
+            <button onclick="logout()" class="mt-6 bg-slate-800 text-white px-6 py-2 rounded-lg font-bold">Logout & Kembali</button>
+        </div>
+    </div>
+
+    <!-- Main Admin Content -->
+    <div id="main-content" class="hidden">
+        
+        <!-- Header -->
+        <header class="bg-indigo-900 text-white p-4 shadow-lg sticky top-0 z-30 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="bg-white text-indigo-900 px-3 py-1 rounded font-black">ADMIN</span>
+                <h1 class="font-bold text-lg hidden md:block">Grecia Event Control</h1>
+            </div>
+            <div class="flex items-center gap-4 text-sm">
+                <span id="current-session-display" class="bg-indigo-700 px-3 py-1 rounded-full font-mono">...</span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-1 rounded font-bold transition">Keluar</button>
+            </div>
+        </header>
+
+        <main class="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Registrasi</p>
+                    <h2 id="total-registrants" class="text-4xl font-black text-slate-800">0</h2>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Hadir Sesi Aktif</p>
+                    <h2 id="total-attendance" class="text-4xl font-black text-green-600">0</h2>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Status Sistem</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-green-600 font-bold">LIVE MONITORING</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Control -->
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                        ⚙️ Kontrol Sesi & Link Live
+                    </h3>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Session ID (Pemicu Absensi)</label>
+                        <input id="session-id-input" type="text" placeholder="Contoh: SESI_PAGI_01" class="w-full p-2 border rounded bg-slate-50 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">YouTube URL</label>
+                        <input id="yt-link-input" type="text" placeholder="https://..." class="w-full p-2 border rounded bg-slate-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Zoom URL</label>
+                        <input id="zoom-link-input" type="text" placeholder="https://..." class="w-full p-2 border rounded bg-slate-50 text-sm">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="updateSession()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded shadow hover:bg-indigo-700 transition">
+                            Update Kontrol
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Registration Table -->
+                <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700">Daftar User Terdaftar</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-[400px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 sticky top-0 border-b">
+                                <tr>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Nama</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Email</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Login</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registration-list">
+                                <!-- Data via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Attendance Table -->
+                <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700">Log Kehadiran (Sesi Ini)</h3>
+                    </div>
+                    <div class="overflow-x-auto max-h-[400px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 sticky top-0 border-b">
+                                <tr>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">User</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Channel</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">Check-In</th>
+                                    <th class="p-3 text-xs font-bold text-slate-400 uppercase">UID</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-list">
+                                <!-- Data via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+        
+        <footer class="p-8 text-center text-slate-400 text-xs">
+            <p>GRECIA ARCHITECTURE &bull; FIREBASE REALTIME MANAGEMENT SYSTEM</p>
+        </footer>
+    </div>
+
 </body>
 </html>
