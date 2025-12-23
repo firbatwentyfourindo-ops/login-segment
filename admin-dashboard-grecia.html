@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen GreciaEdu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .sidebar-item { @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer; }
+        .sidebar-item.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-200; }
+        .sidebar-item.inactive { @apply text-slate-500 hover:bg-slate-100; }
+        .glass-card { @apply bg-white border border-slate-200 rounded-2xl p-6 shadow-sm; }
+        .input-field { @apply w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .empty-state { @apply flex flex-col items-center justify-center py-12 text-slate-400 text-sm italic; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Screen: Login -->
+    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 text-center">
+            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-12 mx-auto mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Portal</h2>
+            <p class="text-slate-500 text-sm mb-8">Masukkan kredensial untuk mengelola sistem.</p>
+            
+            <form id="login-form" class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Nama Admin</label>
+                    <input type="text" id="login-user" required class="input-field mt-1" placeholder="Username">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Password</label>
+                    <input type="password" id="login-pass" required class="input-field mt-1" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all">MASUK KE DASHBOARD</button>
+            </form>
+            <p id="login-error" class="text-red-500 text-xs font-bold mt-4 hidden">Username atau Password salah!</p>
+        </div>
+    </div>
+
+    <!-- Screen: Dashboard -->
+    <div id="screen-dashboard" class="hidden flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 overflow-y-auto no-scrollbar">
+            <div class="mb-10">
+                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-8">
+            </div>
+
+            <nav class="space-y-2 flex-1">
+                <div onclick="switchTab('general')" id="nav-general" class="sidebar-item active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    General Analitik
+                </div>
+                <div onclick="switchTab('viewers')" id="nav-viewers" class="sidebar-item inactive">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Viewers & Absensi
+                </div>
+                <div onclick="switchTab('members')" id="nav-members" class="sidebar-item inactive">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Management Members
+                </div>
+                <div onclick="switchTab('connect')" id="nav-connect" class="sidebar-item inactive">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Connect Pelatihan
+                </div>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-slate-100">
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 transition-all">
+                    LogOut Sesi
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0">
+                <h2 id="tab-title" class="text-xl font-bold text-slate-800">General Analitik</h2>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p id="display-admin-name" class="text-sm font-bold text-slate-800">Admin</p>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Sesi Aktif</p>
+                    </div>
+                </div>
+            </header>
+
+            <div id="content-area" class="flex-1 overflow-y-auto p-8 no-scrollbar">
+                
+                <!-- Tab [General] -->
+                <section id="tab-general" class="tab-pane space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="glass-card">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Viewers</p>
+                            <h3 class="text-3xl font-bold" id="stat-total-views">0</h3>
+                        </div>
+                        <div class="glass-card">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Members Terdaftar</p>
+                            <h3 class="text-3xl font-bold" id="stat-total-members">0</h3>
+                        </div>
+                        <div class="glass-card">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pelatihan Aktif</p>
+                            <h3 class="text-3xl font-bold" id="stat-active-sessions">0</h3>
+                        </div>
+                        <div class="glass-card">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Sistem</p>
+                            <h3 class="text-3xl font-bold text-green-500">Online</h3>
+                        </div>
+                    </div>
+                    <div class="glass-card h-80">
+                        <canvas id="chartGeneral"></canvas>
+                    </div>
+                </section>
+
+                <!-- Tab [Viewers] -->
+                <section id="tab-viewers" class="tab-pane hidden space-y-6">
+                    <div class="glass-card">
+                        <h4 class="font-bold mb-4">Log Absensi & Kehadiran Real-time</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="px-4 py-3">Nama User</th>
+                                        <th class="px-4 py-3">Waktu Kehadiran</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-list" class="divide-y divide-slate-100">
+                                    <!-- Render Otomatis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab [Members] -->
+                <section id="tab-members" class="tab-pane hidden space-y-6">
+                    <div class="glass-card">
+                        <h4 class="font-bold mb-4">Database Seluruh Member</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="px-4 py-3">UID / ID User</th>
+                                        <th class="px-4 py-3 text-right">Info</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="member-list" class="divide-y divide-slate-100">
+                                    <!-- Render Otomatis -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab [Connect] -->
+                <section id="tab-connect" class="tab-pane hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="glass-card">
+                            <h4 class="font-bold mb-4">Buat Pelatihan Baru</h4>
+                            <form id="pelatihan-form" class="space-y-4">
+                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Judul Pelatihan</label><input type="text" id="p-title" required class="input-field mt-1" placeholder="..."></div>
+                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link YouTube</label><input type="url" id="p-yt" required class="input-field mt-1" placeholder="..."></div>
+                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link Zoom</label><input type="url" id="p-zm" required class="input-field mt-1" placeholder="..."></div>
+                                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">PUBLIKASIKAN</button>
+                            </form>
+                        </div>
+                        <div class="glass-card">
+                            <h4 class="font-bold mb-4">Histori Pelatihan</h4>
+                            <div class="space-y-3" id="history-list">
+                                <!-- Render Otomatis -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // LOGIN SYSTEM
+        const SESSION_TIMEOUT = 6 * 60 * 60 * 1000;
+        const loginForm = document.getElementById('login-form');
+        const screenLogin = document.getElementById('screen-login');
+        const screenDashboard = document.getElementById('screen-dashboard');
+
+        loginForm.onsubmit = (e) => {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if(user === "admin" && pass === "grecia123") {
+                const loginData = { name: user, expiry: new Date().getTime() + SESSION_TIMEOUT };
+                localStorage.setItem('admin_session', JSON.stringify(loginData));
+                checkSession();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        };
+
+        function checkSession() {
+            const sessionRaw = localStorage.getItem('admin_session');
+            if (sessionRaw) {
+                const session = JSON.parse(sessionRaw);
+                const now = new Date().getTime();
+                if (now < session.expiry) {
+                    screenLogin.classList.add('hidden');
+                    screenDashboard.classList.remove('hidden');
+                    document.getElementById('display-admin-name').innerText = session.name;
+                    startDataListeners();
+                } else { logout(); }
+            }
+        }
+
+        window.logout = () => {
+            localStorage.removeItem('admin_session');
+            location.reload();
+        };
+
+        setInterval(checkSession, 60000);
+
+        // TAB SYSTEM
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(i => { i.classList.remove('active'); i.classList.add('inactive'); });
+            document.getElementById(`nav-${tabId}`).classList.add('active');
+            document.getElementById(`nav-${tabId}`).classList.remove('inactive');
+        };
+
+        // LISTENERS
+        async function startDataListeners() {
+            await signInAnonymously(auth);
+            
+            // Path genap: artifacts/{appId}/public/data/global/settings
+            const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
+            const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
+            const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list'); // Contoh path
+            const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
+
+            // Listen Settings
+            onSnapshot(settingsDocRef, (snap) => {
+                document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
+            });
+
+            // Listen History
+            onSnapshot(historyColRef, (snap) => {
+                const list = document.getElementById('history-list');
+                if (snap.empty) {
+                    list.innerHTML = `<div class="empty-state">Tidak ada data pelatihan.</div>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const item = d.data();
+                    list.innerHTML += `
+                        <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center">
+                            <div>
+                                <h5 class="font-bold text-xs">${item.title}</h5>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date}</p>
+                            </div>
+                            <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600">Hapus</button>
+                        </div>
+                    `;
+                });
+            });
+
+            // Listen Members
+            onSnapshot(membersColRef, (snap) => {
+                const list = document.getElementById('member-list');
+                document.getElementById('stat-total-members').innerText = snap.size;
+                if (snap.empty) {
+                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data member.</td></tr>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic">Terdaftar</td></tr>`;
+                });
+            });
+
+            // Listen Attendance
+            onSnapshot(attendanceColRef, (snap) => {
+                const list = document.getElementById('attendance-list');
+                document.getElementById('stat-total-views').innerText = snap.size;
+                if (snap.empty) {
+                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data kehadiran hari ini.</td></tr>`;
+                    return;
+                }
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const data = d.data();
+                    list.innerHTML += `<tr><td class="px-4 py-3 font-bold">${data.userName || 'Anonymous'}</td><td class="px-4 py-3 text-slate-500">${data.time || '-'}</td></tr>`;
+                });
+            });
+
+            initCharts();
+        }
+
+        // CRUD
+        document.getElementById('pelatihan-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "MEMPROSES...";
+            const title = document.getElementById('p-title').value;
+            const yt = document.getElementById('p-yt').value;
+            const zm = document.getElementById('p-zm').value;
+            const dateStr = new Date().toLocaleString('id-ID');
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), { youtubeUrl: yt, zoomUrl: zm }, { merge: true });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { title, yt, zm, date: dateStr });
+                e.target.reset();
+                alert("Berhasil diperbarui!");
+            } catch (err) { console.error(err); } finally { btn.innerText = "PUBLIKASIKAN"; }
+        };
+
+        window.deleteHistory = async (id) => {
+            if(confirm("Hapus?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
+        };
+
+        function initCharts() {
+            const ctx = document.getElementById('chartGeneral').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sesi 1', 'Sesi 2', 'Sesi 3', 'Sesi 4'],
+                    datasets: [{ label: 'Interaksi', data: [10, 45, 25, 60], borderColor: '#2563eb', tension: 0.4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>
