@@ -3,330 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Admin | GreciaEdu</title>
+    <title>Admin Dashboard | GreciaEdu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --sidebar-bg: #020617;
-            --surface: #ffffff;
-            --background: #f8fafc;
+            --sidebar-bg: #0f172a;
         }
-
+        
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--background); 
-            color: #1e293b; 
+            background-color: #f1f5f9; /* Slate 100 - Softer than white */
+            color: #334155; 
         }
 
-        /* Glassmorphism Sidebar */
-        .sidebar {
-            background: var(--sidebar-bg);
-            border-right: 1px solid rgba(255,255,255,0.05);
+        /* Custom Scrollbar for better aesthetics */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        
+        /* Navigation Active State */
         .nav-link {
-            @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer mb-2;
-            color: #94a3b8;
+            transition: all 0.2s ease-in-out;
         }
-
-        .nav-link:hover {
-            @apply bg-white/5 text-white translate-x-1;
-        }
-
         .nav-link.active {
-            @apply bg-blue-600 text-white shadow-xl shadow-blue-600/20;
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+        }
+        .nav-link:hover:not(.active) {
+            background-color: #1e293b;
+            color: #f8fafc;
         }
 
-        /* Stat Cards */
-        .stat-card {
-            @apply bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm transition-all duration-500 relative overflow-hidden;
+        /* Card Hover Effects */
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        .stat-card:hover {
-            @apply shadow-2xl shadow-slate-200/60 -translate-y-2 border-blue-200;
+        /* Table Styling */
+        .table-row-hover:hover td {
+            background-color: #f8fafc;
+        }
+        
+        /* Toast Animation */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .stat-card::before {
-            content: '';
-            @apply absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16 transition-transform duration-500;
+        /* Page Transition */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
         }
-
-        .stat-card:hover::before {
-            @apply scale-150;
-        }
-
-        /* Table Design */
-        .table-container {
-            @apply bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden;
-        }
-
-        table { @apply w-full text-left border-collapse; }
-        th { 
-            @apply px-6 py-5 bg-slate-50/50 text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.15em] border-b border-slate-100;
-        }
-        td { 
-            @apply px-6 py-5 border-b border-slate-50 text-sm text-slate-600 align-middle transition-colors duration-200;
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { @apply bg-blue-50/30; }
-
-        /* Modern Inputs */
-        .modern-input {
-            @apply w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm transition-all duration-300 outline-none font-medium;
-        }
-
-        .modern-input:focus {
-            @apply bg-white border-blue-500 ring-4 ring-blue-500/10 shadow-inner;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { 
-            @apply bg-slate-200 rounded-full; 
-        }
-        ::-webkit-scrollbar-thumb:hover { @apply bg-slate-300; }
-
-        /* Animations */
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.98) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .animate-page {
-            animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* Toast Notification */
-        #toast {
-            @apply fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-2xl shadow-2xl transition-all duration-500 opacity-0 translate-y-10 pointer-events-none flex items-center gap-3 font-bold text-sm;
-        }
-        #toast.show {
-            @apply opacity-100 translate-y-0 pointer-events-auto;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden">
-
-    <!-- Toast Component -->
-    <div id="toast"></div>
+<body class="h-screen flex overflow-hidden selection:bg-blue-500 selection:text-white">
 
     <!-- Sidebar -->
-    <aside class="sidebar w-72 flex flex-col p-8 shrink-0 z-30">
-        <div class="flex items-center gap-4 mb-12 px-2">
-            <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-blue-900/40">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+    <aside class="w-72 bg-slate-900 flex flex-col h-full shrink-0 transition-all duration-300 relative z-20">
+        <!-- Logo Area -->
+        <div class="p-8 pb-4">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 flex items-center justify-center bg-white rounded-xl overflow-hidden p-1 shadow-lg shadow-blue-500/10">
+                    <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Grecia Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="text-white font-bold text-xl tracking-tight leading-none">Grecia<span class="text-blue-500">Edu</span></h1>
+                    <p class="text-slate-400 text-xs font-medium mt-1">Administrator Panel</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-white font-extrabold text-xl tracking-tight">Grecia<span class="text-blue-400">Edu</span></h1>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-0.5">Control Center</p>
-            </div>
-        </div>
+            
+            <div class="h-px bg-slate-800 w-full mb-6"></div>
 
-        <nav class="flex-1">
-            <p class="text-[10px] text-slate-600 font-extrabold uppercase tracking-widest mb-4 ml-4">Main Menu</p>
-            <div onclick="switchTab('general')" id="nav-general" class="nav-link active group">
-                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                </div>
-                Ringkasan
-            </div>
-            <div onclick="switchTab('viewers')" id="nav-viewers" class="nav-link group">
-                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </div>
-                Peserta Hadir
-            </div>
-            <div onclick="switchTab('members')" id="nav-members" class="nav-link group">
-                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                </div>
-                Database User
-            </div>
-            <div onclick="switchTab('connect')" id="nav-connect" class="nav-link group">
-                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                Kontrol Sesi
-            </div>
-        </nav>
-
-        <div class="mt-auto bg-slate-900/50 p-5 rounded-[2rem] border border-white/5 relative overflow-hidden group">
-            <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-blue-600/10 rounded-full blur-2xl group-hover:bg-blue-600/20 transition-all"></div>
-            <div class="flex items-center gap-3 mb-2">
-                <span class="relative flex h-3 w-3">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                </span>
-                <span class="text-[10px] font-extrabold text-slate-300 uppercase tracking-widest">Live Sync</span>
-            </div>
-            <p class="text-[10px] text-slate-500 leading-relaxed font-medium">Firebase Firestore v11.6.1 <br> Real-time Protocol Enabled</p>
+            <nav class="space-y-2">
+                <button onclick="switchTab('general')" id="nav-general" class="nav-link w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-400 active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Ringkasan
+                </button>
+                <button onclick="switchTab('viewers')" id="nav-viewers" class="nav-link w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Peserta Hadir
+                </button>
+                <button onclick="switchTab('members')" id="nav-members" class="nav-link w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Database User
+                </button>
+                <button onclick="switchTab('connect')" id="nav-connect" class="nav-link w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-medium text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Kontrol Sesi
+                </button>
+            </nav>
         </div>
+        <!-- Bottom status removed as requested -->
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden relative">
-        <!-- Header -->
-        <header class="h-24 bg-white/70 backdrop-blur-2xl border-b border-slate-100 px-10 flex items-center justify-between sticky top-0 z-20">
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-[#F8F9FC]">
+        <!-- Top Bar -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
             <div>
-                <h2 id="page-title" class="text-2xl font-extrabold text-slate-900 tracking-tight">Ringkasan Dashboard</h2>
-                <p id="page-subtitle" class="text-xs font-semibold text-slate-400 mt-0.5">Monitoring platform real-time analytics.</p>
+                <h2 id="page-title" class="text-xl font-bold text-slate-800">Ringkasan Dashboard</h2>
+                <p id="page-subtitle" class="text-xs text-slate-500 font-medium mt-0.5">Ringkasan aktivitas platform hari ini.</p>
             </div>
+            
+            <!-- User/Session info removed as requested -->
             <div class="flex items-center gap-4">
-                <div id="session-badge" class="bg-blue-50 text-blue-600 px-5 py-2.5 rounded-2xl border border-blue-100 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
-                    Sesi: --
-                </div>
             </div>
         </header>
 
         <!-- Content Area -->
-        <div class="flex-1 overflow-y-auto p-10 no-scrollbar space-y-10">
-            
-            <!-- Tab: General -->
-            <section id="tab-general" class="animate-page space-y-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="stat-card group">
-                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-5 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </div>
-                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Kehadiran Live</p>
-                        <div class="flex items-baseline gap-2 mt-2">
-                            <h3 id="stat-viewers" class="text-4xl font-black text-slate-900">0</h3>
-                            <span class="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">Online</span>
-                        </div>
-                    </div>
-
-                    <div class="stat-card group">
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-5 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        </div>
-                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Database User</p>
-                        <h3 id="stat-members" class="text-4xl font-black text-slate-900 mt-2">0</h3>
-                    </div>
-
-                    <div class="stat-card group">
-                        <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-5 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Pembaruan Sesi</p>
-                        <h3 id="stat-history" class="text-4xl font-black text-slate-900 mt-2">0</h3>
-                    </div>
-
-                    <div class="stat-card bg-slate-900 border-none shadow-2xl shadow-blue-900/20 group">
-                        <div class="w-12 h-12 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center text-blue-400 mb-5 group-hover:scale-110 transition-transform">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2z"/></svg>
-                        </div>
-                        <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Status Gateway</p>
-                        <div class="flex items-center gap-2 mt-2">
-                            <h3 class="text-4xl font-black text-white">Active</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Empty State Visual -->
-                <div class="bg-white rounded-[3rem] border border-slate-100 p-16 flex flex-col items-center justify-center min-h-[450px] text-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-30"></div>
-                    <div class="w-24 h-24 bg-blue-50 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner relative z-10">
-                        <svg class="w-10 h-10 text-blue-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h4 class="text-slate-900 font-black text-xl mb-3 relative z-10">Ready for Insights</h4>
-                    <p class="text-slate-400 text-sm max-w-sm font-medium relative z-10">Data visualisasi sedang disiapkan. Dashboard akan otomatis memperbarui tampilan saat trafik mulai masuk.</p>
-                </div>
-            </section>
-
-            <!-- Tab: Viewers -->
-            <section id="tab-viewers" class="hidden animate-page space-y-6">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Profil Peserta</th>
-                                <th>Channel</th>
-                                <th>Waktu Akses</th>
-                                <th>ID Sesi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="viewer-list"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Tab: Members -->
-            <section id="tab-members" class="hidden animate-page space-y-6">
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Identitas Lengkap</th>
-                                <th>Email Address</th>
-                                <th>Auth Method</th>
-                                <th>Tanggal Daftar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="member-list"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Tab: Connect -->
-            <section id="tab-connect" class="hidden animate-page grid grid-cols-12 gap-10">
-                <div class="col-span-12 lg:col-span-5 space-y-8">
-                    <div class="bg-white rounded-[3rem] border border-slate-100 p-10 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-8">
-                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+        <div class="flex-1 overflow-y-auto p-8 custom-scroll">
+            <div class="max-w-7xl mx-auto">
+                
+                <!-- Tab: General -->
+                <section id="tab-general" class="fade-in space-y-8">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover-lift flex flex-col justify-between h-40">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400">Kehadiran Live</p>
+                                    <h3 id="stat-viewers" class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
+                                </div>
+                                <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">
+                                <span class="relative flex h-2 w-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                                Monitoring Real-time
                             </div>
                         </div>
-                        <h3 class="text-2xl font-black text-slate-900 mb-8 tracking-tight">Broadcast Control</h3>
-                        <form id="connect-form" class="space-y-6">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Session Identity</label>
-                                <input type="text" id="c-session" placeholder="CONTOH: BATCH-01" required class="modern-input font-mono uppercase text-blue-600 font-bold tracking-widest">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">YouTube Live Stream</label>
-                                <input type="url" id="c-yt" placeholder="https://youtube.com/live/..." required class="modern-input">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Zoom Meeting Link</label>
-                                <input type="url" id="c-zm" placeholder="https://zoom.us/j/..." required class="modern-input">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[2rem] transition-all duration-300 shadow-xl shadow-blue-200 flex items-center justify-center gap-3 active:scale-95 mt-4">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                                PUBLISH SESSION
-                            </button>
-                        </form>
-                    </div>
-                </div>
 
-                <div class="col-span-12 lg:col-span-7">
-                    <div class="table-container">
-                        <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
-                            <h4 class="text-sm font-black text-slate-800 uppercase tracking-[0.2em]">Update Logs</h4>
+                        <!-- Card 2 -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover-lift flex flex-col justify-between h-40">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400">Total User</p>
+                                    <h3 id="stat-members" class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
+                                </div>
+                                <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-400">Terdaftar dalam database</div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Akses</th>
-                                    <th>ID Sesi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-list"></tbody>
-                        </table>
+
+                        <!-- Card 3 -->
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover-lift flex flex-col justify-between h-40">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-400">Log Pembaruan</p>
+                                    <h3 id="stat-history" class="text-3xl font-extrabold text-slate-800 mt-2">0</h3>
+                                </div>
+                                <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-400">Total sesi yang dibuat</div>
+                        </div>
                     </div>
-                </div>
-            </section>
+
+                    <!-- Placeholder Graphic Area -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center border-dashed border-2">
+                         <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                         </div>
+                         <h3 class="text-lg font-bold text-slate-800">Analitik Mendalam</h3>
+                         <p class="text-slate-500 text-sm mt-2 max-w-md mx-auto">Fitur visualisasi grafik untuk memantau tren kehadiran dan pendaftaran user akan segera tersedia di pembaruan berikutnya.</p>
+                    </div>
+                </section>
+
+                <!-- Tab: Viewers (Improved Table) -->
+                <section id="tab-viewers" class="hidden fade-in">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800">Daftar Kehadiran</h3>
+                            <div class="flex gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">User Info</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Channel</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Check-in Time</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Target Session</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="viewer-list" class="divide-y divide-slate-50">
+                                    <!-- JS Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab: Members -->
+                <section id="tab-members" class="hidden fade-in">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800">Database User Terdaftar</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Nama Lengkap</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Email Address</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Auth Method</th>
+                                        <th class="px-8 py-5 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">Joined Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="member-list" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tab: Connect -->
+                <section id="tab-connect" class="hidden fade-in">
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                        <!-- Control Panel -->
+                        <div class="xl:col-span-1">
+                            <div class="bg-white p-8 rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] sticky top-24">
+                                <div class="mb-8">
+                                    <h3 class="text-xl font-bold text-slate-800">Buat Sesi Baru</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Isi detail di bawah untuk mengupdate link webinar.</p>
+                                </div>
+                                
+                                <form id="connect-form" class="space-y-6">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 ml-1">Kode Sesi</label>
+                                        <input type="text" id="c-session" placeholder="CONTOH: WEB-001" required 
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-blue-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all uppercase">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 ml-1">YouTube Live URL</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                                            </div>
+                                            <input type="url" id="c-yt" placeholder="https://youtube.com/..." required 
+                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 ml-1">Zoom Meeting URL</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                            </div>
+                                            <input type="url" id="c-zm" placeholder="https://zoom.us/..." required 
+                                                class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-900/20 transition-all duration-300 flex items-center justify-center gap-2 group">
+                                        <span>Broadcast Session</span>
+                                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- History List -->
+                        <div class="xl:col-span-2">
+                            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                    <h3 class="font-bold text-slate-800">Riwayat Sesi</h3>
+                                    <span class="text-xs font-medium text-slate-400">Diurutkan berdasarkan waktu terbaru</span>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-6 py-4 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">Timestamp</th>
+                                                <th class="px-6 py-4 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">Session ID</th>
+                                                <th class="px-6 py-4 bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="history-list" class="divide-y divide-slate-50"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </div>
     </main>
 
+    <!-- Custom Toast Notification -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
             authDomain: "registrasi-user-grecia.firebaseapp.com",
@@ -337,68 +343,89 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = firebaseConfig.appId;
-
         let activeSessionId = "";
 
-        // Custom Notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.className = `show ${type === 'success' ? 'bg-slate-900 text-white border-blue-500 border' : 'bg-red-500 text-white'}`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        // Auth Flow
-        async function initAuth() {
-            try {
-                await signInAnonymously(auth);
-                initData();
-            } catch (err) {
-                showToast("Auth Error: Gagal terhubung ke server.", "error");
-            }
-        }
-
-        // Navigation
-        window.switchTab = (id) => {
-            const sections = {
-                'general': ['Ringkasan Dashboard', 'Monitoring platform real-time analytics.'],
-                'viewers': ['Daftar Kehadiran', 'Data log peserta yang mengakses link hari ini.'],
-                'members': ['Database Pengguna', 'Data seluruh user terdaftar dalam sistem.'],
-                'connect': ['Broadcaster Control', 'Update link YouTube dan Zoom sesi aktif.']
-            };
-
-            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`tab-${id}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(`nav-${id}`).classList.add('active');
+        // UI Helpers
+        const showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            document.getElementById('page-title').innerText = sections[id][0];
-            document.getElementById('page-subtitle').innerText = sections[id][1];
+            const colors = type === 'success' 
+                ? 'bg-emerald-500 text-white shadow-emerald-500/30' 
+                : 'bg-red-500 text-white shadow-red-500/30';
+                
+            const icon = type === 'success'
+                ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+                : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+
+            toast.className = `toast-enter pointer-events-auto flex items-center gap-3 px-6 py-4 rounded-2xl shadow-lg ${colors} transform transition-all duration-300 min-w-[300px]`;
+            toast.innerHTML = `
+                ${icon}
+                <span class="font-semibold text-sm">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         };
 
-        // UI Helpers
         const formatTime = (date) => {
-            if(!date) return '--:--';
+            if(!date) return '-';
             return new Intl.DateTimeFormat('id-ID', {
                 hour: '2-digit', minute: '2-digit', second: '2-digit'
             }).format(date);
         };
 
-        // Data Streams
+        const formatDate = (date) => {
+            if(!date) return '-';
+            return new Intl.DateTimeFormat('id-ID', {
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            }).format(date);
+        };
+
+        // Navigation
+        window.switchTab = (id) => {
+            const titles = {
+                'general': ['Ringkasan Dashboard', 'Ringkasan aktivitas platform hari ini.'],
+                'viewers': ['Daftar Kehadiran', 'Peserta yang mengakses sesi saat ini.'],
+                'members': ['Database User', 'Manajemen seluruh data pengguna terdaftar.'],
+                'connect': ['Kontrol Sesi', 'Pengaturan broadcast link webinar.']
+            };
+
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active', 'text-white', 'bg-blue-600', 'shadow-lg');
+                l.classList.add('text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById(`nav-${id}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('text-slate-400');
+            
+            document.getElementById('page-title').innerText = titles[id][0];
+            document.getElementById('page-subtitle').innerText = titles[id][1];
+        };
+
+        // Realtime Logic
         function initData() {
-            // Global Settings
+            // Settings
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
-                    activeSessionId = data.sessionId || "NONE";
-                    document.getElementById('session-badge').innerText = `Sesi: ${activeSessionId}`;
+                    activeSessionId = data.sessionId || "ID-UNKNOWN";
+                    // Removed badge update logic as elements are removed
                 }
-            }, (err) => console.error("Snapshot Error:", err));
+            });
 
-            // Attendance Stream
+            // Attendance
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
                 const list = document.getElementById('viewer-list');
                 list.innerHTML = "";
@@ -408,24 +435,31 @@
                 snap.forEach(d => {
                     const it = d.data();
                     const isCurrent = it.sessionId === activeSessionId;
+                    
                     list.innerHTML += `
-                        <tr class="${isCurrent ? 'bg-blue-50/20' : ''}">
-                            <td>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-sm border border-slate-200/50">
-                                        ${(it.userName || 'U').charAt(0)}
+                        <tr class="table-row-hover transition-colors border-b border-slate-50 last:border-0 ${isCurrent ? 'bg-blue-50/30' : ''}">
+                            <td class="px-8 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-xs text-indigo-600">
+                                        ${(it.userName || 'U').charAt(0).toUpperCase()}
                                     </div>
-                                    <span class="font-bold text-slate-800 tracking-tight">${it.userName || 'Peserta Anonim'}</span>
+                                    <div>
+                                        <div class="font-bold text-slate-700 text-sm">${it.userName || 'Anonymous'}</div>
+                                        <div class="text-[10px] text-slate-400 font-mono">ID: ${d.id.substring(0,6)}...</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${it.channel === 'YOUTUBE' ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600'}">
-                                    ${it.channel || 'DIRECT LINK'}
+                            <td class="px-8 py-4">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${it.channel === 'YOUTUBE' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}">
+                                    ${it.channel === 'YOUTUBE' ? '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>' : ''}
+                                    ${it.channel || 'LINK'}
                                 </span>
                             </td>
-                            <td class="font-bold text-slate-400 text-xs">${formatTime(it.clickedAt?.toDate())}</td>
-                            <td>
-                                <span class="text-[10px] font-black px-3 py-1 rounded-lg border uppercase ${isCurrent ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-slate-100 text-slate-300'}">
+                            <td class="px-8 py-4 text-sm font-medium text-slate-500 font-mono">
+                                ${formatTime(it.clickedAt?.toDate())} WIB
+                            </td>
+                            <td class="px-8 py-4">
+                                <span class="text-[10px] font-bold px-2 py-1 rounded border ${isCurrent ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 text-slate-400'}">
                                     ${it.sessionId || 'N/A'}
                                 </span>
                             </td>
@@ -433,52 +467,66 @@
                 });
             });
 
-            // Member Stream
+            // Registrations
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), (snap) => {
                 document.getElementById('stat-members').innerText = snap.size;
                 const list = document.getElementById('member-list');
                 list.innerHTML = "";
                 snap.forEach(d => {
                     const it = d.data();
-                    list.innerHTML += `<tr>
-                        <td><span class="font-black text-slate-800">${it.fullName || '-'}</span></td>
-                        <td><span class="text-slate-500 font-medium">${it.email || '-'}</span></td>
-                        <td><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">${it.method || 'WEB'}</span></td>
-                        <td class="text-xs font-bold text-slate-400">${it.submittedAt?.toDate().toLocaleDateString('id-ID') || '-'}</td>
+                    list.innerHTML += `
+                    <tr class="table-row-hover border-b border-slate-50 last:border-0">
+                        <td class="px-8 py-4 font-semibold text-slate-700 text-sm">${it.fullName || '-'}</td>
+                        <td class="px-8 py-4 text-slate-500 text-sm">${it.email || '-'}</td>
+                        <td class="px-8 py-4">
+                             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide bg-slate-100 px-2 py-1 rounded-md border border-slate-200">${it.method || 'AUTH'}</span>
+                        </td>
+                        <td class="px-8 py-4 text-xs text-slate-400 font-medium">${formatDate(it.submittedAt?.toDate())}</td>
                     </tr>`;
                 });
             });
 
-            // History Stream
+            // History
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'history'), (snap) => {
                 document.getElementById('stat-history').innerText = snap.size;
                 const list = document.getElementById('history-list');
                 list.innerHTML = "";
+                
                 const sorted = snap.docs.map(d => ({id: d.id, ...d.data()}))
                     .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
                 sorted.forEach(it => {
-                    const ts = it.createdAt?.toDate().toLocaleString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                    list.innerHTML += `<tr>
-                        <td class="text-[10px] font-black text-slate-400 uppercase">${ts || '--'}</td>
-                        <td>
-                            <div class="flex gap-3">
-                                <a href="${it.youtubeUrl}" target="_blank" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></a>
-                                <a href="${it.zoomUrl}" target="_blank" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-blue-500 hover:bg-blue-600 hover:text-white transition-all duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></a>
+                    list.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                        <td class="px-6 py-4">
+                            <div class="text-xs font-bold text-slate-700">${formatDate(it.createdAt?.toDate())}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">${it.sessionId}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex gap-2 justify-end">
+                                <a href="${it.youtubeUrl}" target="_blank" class="p-2 rounded-lg text-red-500 bg-red-50 hover:bg-red-500 hover:text-white transition-all border border-red-100">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                                </a>
+                                <a href="${it.zoomUrl}" target="_blank" class="p-2 rounded-lg text-blue-500 bg-blue-50 hover:bg-blue-600 hover:text-white transition-all border border-blue-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                </a>
                             </div>
                         </td>
-                        <td><span class="font-black text-slate-900 font-mono tracking-tighter uppercase text-xs">${it.sessionId}</span></td>
                     </tr>`;
                 });
             });
         }
 
-        // Form Action
+        // Form Submit
         document.getElementById('connect-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span> UPDATING...`;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
             
             const payload = {
                 sessionId: document.getElementById('c-session').value.trim().toUpperCase(),
@@ -493,18 +541,19 @@
                     ...payload,
                     createdAt: serverTimestamp()
                 });
-                showToast(`Sukses! Sesi ${payload.sessionId} kini aktif.`);
+                
+                showToast(`Sesi <b>${payload.sessionId}</b> berhasil disiarkan!`);
                 e.target.reset();
             } catch (err) {
                 console.error(err);
-                showToast("Gagal memperbarui database.", "error");
+                showToast("Gagal mengupdate sesi.", "error");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg> PUBLISH SESSION`;
+                btn.innerHTML = originalContent;
             }
         };
 
-        window.onload = initAuth;
+        window.onload = initData;
     </script>
 </body>
 </html>
