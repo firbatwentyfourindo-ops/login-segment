@@ -189,11 +189,23 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // --- FIX UNTUK HOSTING LUAR ---
+        // Jika variabel global tidak ada, gunakan default atau ganti manual di sini
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "MASUKKAN_API_KEY_ANDA",
+                authDomain: "PROJECT_ANDA.firebaseapp.com",
+                projectId: "PROJECT_ANDA",
+                storageBucket: "PROJECT_ANDA.appspot.com",
+                messagingSenderId: "ID_ANDA",
+                appId: "ID_APP_ANDA"
+            };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
 
         // LOGIN SYSTEM
         const SESSION_TIMEOUT = 6 * 60 * 60 * 1000;
@@ -247,71 +259,70 @@
 
         // LISTENERS
         async function startDataListeners() {
-            await signInAnonymously(auth);
-            
-            // Path genap: artifacts/{appId}/public/data/global/settings
-            const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
-            const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
-            const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list'); // Contoh path
-            const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
+            try {
+                await signInAnonymously(auth);
+                
+                const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
+                const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
+                const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list');
+                const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
 
-            // Listen Settings
-            onSnapshot(settingsDocRef, (snap) => {
-                document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
-            });
+                onSnapshot(settingsDocRef, (snap) => {
+                    document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
+                }, (err) => console.log("Waiting for data..."));
 
-            // Listen History
-            onSnapshot(historyColRef, (snap) => {
-                const list = document.getElementById('history-list');
-                if (snap.empty) {
-                    list.innerHTML = `<div class="empty-state">Tidak ada data pelatihan.</div>`;
-                    return;
-                }
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const item = d.data();
-                    list.innerHTML += `
-                        <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center">
-                            <div>
-                                <h5 class="font-bold text-xs">${item.title}</h5>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date}</p>
+                onSnapshot(historyColRef, (snap) => {
+                    const list = document.getElementById('history-list');
+                    if (snap.empty) {
+                        list.innerHTML = `<div class="empty-state">Tidak ada data pelatihan.</div>`;
+                        return;
+                    }
+                    list.innerHTML = "";
+                    snap.forEach(d => {
+                        const item = d.data();
+                        list.innerHTML += `
+                            <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center">
+                                <div>
+                                    <h5 class="font-bold text-xs">${item.title}</h5>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date}</p>
+                                </div>
+                                <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600">Hapus</button>
                             </div>
-                            <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600">Hapus</button>
-                        </div>
-                    `;
+                        `;
+                    });
                 });
-            });
 
-            // Listen Members
-            onSnapshot(membersColRef, (snap) => {
-                const list = document.getElementById('member-list');
-                document.getElementById('stat-total-members').innerText = snap.size;
-                if (snap.empty) {
-                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data member.</td></tr>`;
-                    return;
-                }
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic">Terdaftar</td></tr>`;
+                onSnapshot(membersColRef, (snap) => {
+                    const list = document.getElementById('member-list');
+                    document.getElementById('stat-total-members').innerText = snap.size;
+                    if (snap.empty) {
+                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data member.</td></tr>`;
+                        return;
+                    }
+                    list.innerHTML = "";
+                    snap.forEach(d => {
+                        list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic">Terdaftar</td></tr>`;
+                    });
                 });
-            });
 
-            // Listen Attendance
-            onSnapshot(attendanceColRef, (snap) => {
-                const list = document.getElementById('attendance-list');
-                document.getElementById('stat-total-views').innerText = snap.size;
-                if (snap.empty) {
-                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data kehadiran hari ini.</td></tr>`;
-                    return;
-                }
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const data = d.data();
-                    list.innerHTML += `<tr><td class="px-4 py-3 font-bold">${data.userName || 'Anonymous'}</td><td class="px-4 py-3 text-slate-500">${data.time || '-'}</td></tr>`;
+                onSnapshot(attendanceColRef, (snap) => {
+                    const list = document.getElementById('attendance-list');
+                    document.getElementById('stat-total-views').innerText = snap.size;
+                    if (snap.empty) {
+                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data kehadiran hari ini.</td></tr>`;
+                        return;
+                    }
+                    list.innerHTML = "";
+                    snap.forEach(d => {
+                        const data = d.data();
+                        list.innerHTML += `<tr><td class="px-4 py-3 font-bold">${data.userName || 'Anonymous'}</td><td class="px-4 py-3 text-slate-500">${data.time || '-'}</td></tr>`;
+                    });
                 });
-            });
 
-            initCharts();
+                initCharts();
+            } catch (e) {
+                console.error("Firebase Error:", e);
+            }
         }
 
         // CRUD
@@ -329,7 +340,7 @@
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { title, yt, zm, date: dateStr });
                 e.target.reset();
                 alert("Berhasil diperbarui!");
-            } catch (err) { console.error(err); } finally { btn.innerText = "PUBLIKASIKAN"; }
+            } catch (err) { alert("Gagal menyimpan. Cek konfigurasi Firebase."); } finally { btn.innerText = "PUBLIKASIKAN"; }
         };
 
         window.deleteHistory = async (id) => {
