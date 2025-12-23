@@ -5,108 +5,167 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Peserta | GreciaEdu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .session-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .session-btn:active { transform: scale(0.95); }
-        #loading-overlay { position: fixed; inset: 0; background: #ffffff; z-index: 50; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc; /* Slate 50 */
+            color: #334155;
+        }
+        
+        /* Smooth transitions */
+        .hover-scale {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-scale:active {
+            transform: scale(0.98);
+        }
+
+        /* Loading Animation */
+        #loading-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: #ffffff; 
+            z-index: 50; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: opacity 0.5s ease-out, visibility 0.5s; 
+        }
+        
+        .fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Custom Card Styles */
+        .modern-card {
+            background: white;
+            border-radius: 1.5rem; /* rounded-3xl */
+            border: 1px solid #e2e8f0; /* border-slate-200 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
 
     <!-- Loading Screen -->
     <div id="loading-overlay">
-        <div class="flex flex-col items-center">
-            <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <p class="mt-4 text-slate-500 font-medium animate-pulse">Memverifikasi Sesi...</p>
+        <div class="flex flex-col items-center gap-4">
+            <div class="relative w-16 h-16">
+                <div class="absolute inset-0 border-4 border-slate-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <div class="flex flex-col items-center">
+                <h3 class="text-slate-800 font-bold text-lg">GreciaEdu</h3>
+                <p class="text-slate-400 text-sm font-medium animate-pulse">Menyiapkan ruang sesi...</p>
+            </div>
         </div>
     </div>
 
     <!-- Header Section -->
-    <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-lg mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 flex items-center justify-center bg-white rounded-lg overflow-hidden p-0.5 shadow-md shadow-blue-500/10 border border-slate-100">
+                    <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-lg leading-none">Grecia<span class="text-blue-600">Edu</span></h1>
+                </div>
             </div>
-            <h1 class="font-extrabold text-slate-800 tracking-tight">Grecia<span class="text-blue-600">Edu</span></h1>
-        </div>
-        <div id="user-initial" class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">
-            ?
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p id="header-name" class="text-xs font-bold text-slate-700">Peserta</p>
+                    <p class="text-[10px] text-slate-400">Online</p>
+                </div>
+                <div id="user-initial" class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-extrabold text-slate-600 shadow-sm">
+                    ?
+                </div>
+            </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 max-w-lg mx-auto w-full space-y-6">
+    <main class="flex-1 p-6 max-w-lg mx-auto w-full space-y-6 pb-20">
         
-        <!-- User Info Card -->
-        <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200">
-            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Selamat Datang,</p>
-            <h2 id="display-name" class="text-xl font-extrabold text-slate-900 leading-tight">Memuat Nama...</h2>
-            <p id="display-email" class="text-sm text-slate-500 font-medium"></p>
+        <!-- Welcome Card -->
+        <div class="modern-card p-6 bg-gradient-to-br from-white to-slate-50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+            <div class="relative z-10">
+                <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Dashboard Peserta</p>
+                <h2 id="display-name" class="text-2xl font-extrabold text-slate-800 leading-tight mb-1">Memuat data...</h2>
+                <p id="display-email" class="text-sm text-slate-500 font-medium"></p>
+            </div>
         </div>
 
         <!-- Attendance & Session Status -->
-        <div id="status-card" class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div id="attendance-icon" class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div id="status-card" class="modern-card p-5 flex items-center justify-between transition-all duration-300">
+            <div class="flex items-center gap-4">
+                <div id="attendance-icon" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status Presensi</p>
-                    <p id="attendance-status" class="text-sm font-extrabold text-slate-800">Mengecek data...</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Status Presensi</p>
+                    <p id="attendance-status" class="text-sm font-bold text-slate-700 transition-colors">Menunggu Sesi...</p>
                 </div>
             </div>
-            <div id="session-label" class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                Sesi: ---
+            <div id="session-badge" class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-slate-200">
+                OFFLINE
             </div>
         </div>
 
-        <!-- Live Links Container -->
-        <div id="session-content" class="space-y-4">
-            <!-- Menunggu Session Aktif -->
-            <div id="no-session" class="hidden text-center py-12 px-6">
-                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <!-- Session Content Area -->
+        <div id="session-content" class="min-h-[200px]">
+            
+            <!-- State: No Session -->
+            <div id="no-session" class="modern-card p-8 text-center flex flex-col items-center justify-center h-64 border-dashed border-2 border-slate-200 shadow-none">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                 </div>
-                <h3 class="text-slate-900 font-bold">Belum Ada Sesi Aktif</h3>
-                <p class="text-slate-500 text-sm mt-1">Silakan tunggu instruksi dari admin atau refresh halaman ini nanti.</p>
+                <h3 class="text-slate-800 font-bold text-lg">Belum Ada Sesi Aktif</h3>
+                <p class="text-slate-500 text-sm mt-2 max-w-xs mx-auto">Silakan tunggu notifikasi dari admin atau refresh halaman ini secara berkala.</p>
             </div>
 
-            <!-- List Tombol Sesi -->
-            <div id="active-session-ui" class="hidden space-y-4">
-                <div class="bg-blue-600/5 border border-blue-100 rounded-2xl p-4">
-                    <p class="text-xs text-blue-600 font-semibold text-center leading-relaxed">Sesi live telah dimulai! Klik tombol di bawah untuk bergabung ke platform pilihan Anda.</p>
+            <!-- State: Active Session -->
+            <div id="active-session-ui" class="hidden space-y-4 animate-fade-in">
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 items-start">
+                    <svg class="w-5 h-5 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="text-xs text-blue-800 font-medium leading-relaxed">Sesi live sedang berlangsung! Presensi Anda akan tercatat otomatis saat Anda mengklik salah satu tombol di bawah.</p>
                 </div>
 
-                <a id="link-youtube" onclick="recordAttendance('YOUTUBE')" target="_blank" class="session-btn block w-full bg-white border-2 border-slate-100 hover:border-red-500 p-5 rounded-3xl shadow-sm flex items-center gap-4 group">
-                    <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                <a id="link-youtube" onclick="recordAttendance('YOUTUBE')" target="_blank" class="hover-scale group modern-card p-5 flex items-center gap-5 cursor-pointer hover:border-red-200 hover:shadow-lg hover:shadow-red-500/5 transition-all">
+                    <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-extrabold text-slate-900">Nonton via YouTube</h4>
-                        <p class="text-xs text-slate-500">Streaming kualitas HD & Live Chat</p>
+                        <h4 class="font-bold text-slate-800 text-lg group-hover:text-red-600 transition-colors">YouTube Live</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Streaming HD & Komentar</p>
                     </div>
-                    <svg class="w-5 h-5 text-slate-300 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-red-50 group-hover:text-red-500 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
                 </a>
 
-                <a id="link-zoom" onclick="recordAttendance('ZOOM')" target="_blank" class="session-btn block w-full bg-white border-2 border-slate-100 hover:border-blue-500 p-5 rounded-3xl shadow-sm flex items-center gap-4 group">
-                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <a id="link-zoom" onclick="recordAttendance('ZOOM')" target="_blank" class="hover-scale group modern-card p-5 flex items-center gap-5 cursor-pointer hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-extrabold text-slate-900">Masuk via Zoom</h4>
-                        <p class="text-xs text-slate-500">Interaksi langsung & Tanya Jawab</p>
+                        <h4 class="font-bold text-slate-800 text-lg group-hover:text-blue-600 transition-colors">Zoom Meeting</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Interaksi Langsung & QnA</p>
                     </div>
-                    <svg class="w-5 h-5 text-slate-300 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
                 </a>
             </div>
+
         </div>
 
     </main>
 
-    <footer class="p-8 text-center">
+    <footer class="mt-auto p-6 text-center border-t border-slate-100 bg-white/50 backdrop-blur-sm">
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by GreciaEdu Infrastructure</p>
     </footer>
 
@@ -135,7 +194,10 @@
         // 1. AUTH GUARD
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                window.location.href = "register.html";
+                // Redirect ke halaman login jika belum login
+                // window.location.href = "index.html"; // Uncomment jika halaman login ada di index.html
+                // Untuk demo, kita biarkan tapi kasih notif
+                console.log("User not logged in");
                 return;
             }
             currentUser = user;
@@ -145,10 +207,14 @@
 
         function updateUserUI(user) {
             document.getElementById('display-name').innerText = user.displayName || "Peserta";
+            document.getElementById('header-name').innerText = (user.displayName || "Peserta").split(' ')[0];
             document.getElementById('display-email').innerText = user.email;
             document.getElementById('user-initial').innerText = (user.displayName || 'U').charAt(0).toUpperCase();
-            document.getElementById('loading-overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+            
+            // Hide loading
+            const loader = document.getElementById('loading-overlay');
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.style.display = 'none', 500);
         }
 
         // 2. SESSION LISTENER (REALTIME)
@@ -160,7 +226,7 @@
                     const data = snap.data();
                     const newSessionId = data.sessionId;
 
-                    // Jika session berubah, update UI & reset state absensi lokal
+                    // Jika session berubah, update UI & cek absensi
                     if (newSessionId !== activeSessionId) {
                         activeSessionId = newSessionId;
                         updateSessionUI(data);
@@ -177,36 +243,57 @@
         function updateSessionUI(data) {
             document.getElementById('no-session').classList.add('hidden');
             document.getElementById('active-session-ui').classList.remove('hidden');
-            document.getElementById('session-label').innerText = `Sesi: ${data.sessionId}`;
-            document.getElementById('session-label').className = "bg-blue-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter";
+            
+            const badge = document.getElementById('session-badge');
+            badge.innerText = `SESI: ${data.sessionId}`;
+            badge.className = "bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm shadow-blue-500/30";
             
             document.getElementById('link-youtube').href = data.youtubeUrl;
             document.getElementById('link-zoom').href = data.zoomUrl;
+
+            // Reset status tampilan jika sesi baru
+            resetAttendanceUI();
         }
 
         function showNoSession() {
             document.getElementById('no-session').classList.remove('hidden');
             document.getElementById('active-session-ui').classList.add('hidden');
-            document.getElementById('session-label').innerText = "Sesi: ---";
-            document.getElementById('session-label').className = "bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter";
-            document.getElementById('attendance-status').innerText = "Menunggu Sesi";
+            
+            const badge = document.getElementById('session-badge');
+            badge.innerText = "OFFLINE";
+            badge.className = "bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-slate-200";
+            
+            resetAttendanceUI();
         }
 
-        // 3. LOGIC ABSENSI (KRITIS: CEK DULU SEBELUM TULIS)
+        function resetAttendanceUI() {
+            const statusEl = document.getElementById('attendance-status');
+            const iconEl = document.getElementById('attendance-icon');
+            
+            statusEl.innerText = "Menunggu Check-in...";
+            statusEl.className = "text-sm font-bold text-slate-500 transition-colors";
+            
+            iconEl.className = "w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 transition-colors duration-300";
+            iconEl.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+        }
+
+        // 3. LOGIC ABSENSI
         async function checkAndAutoAttend(sessionId) {
             if (!currentUser || !sessionId) return;
 
-            const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', currentUser.uid, sessionId);
+            // Gunakan ID Unik: UID + SESSIONID agar 1 user 1 absen per sesi
+            const docId = `${currentUser.uid}_${sessionId}`;
+            const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId);
             
             try {
                 const snap = await getDoc(attendRef);
                 
                 if (snap.exists()) {
-                    // Sudah absen untuk sesi ini
+                    // Sudah absen
                     markAsAttended();
                 } else {
-                    // Belum absen, catat otomatis saat halaman terbuka dan sesi aktif
-                    await executeAttendance(sessionId, 'AUTO_OPEN');
+                    // Belum absen, catat otomatis saat buka dashboard
+                    await executeAttendance(sessionId, 'AUTO_DASHBOARD');
                 }
             } catch (err) {
                 console.error("Attendance check error:", err);
@@ -216,15 +303,19 @@
         async function executeAttendance(sessionId, channel) {
             if (!currentUser || !sessionId) return;
             
-            const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', currentUser.uid, sessionId);
+            const docId = `${currentUser.uid}_${sessionId}`;
+            const attendRef = doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId);
             
-            // Double check inside the function to ensure no racing conditions
+            // Double check
             const snap = await getDoc(attendRef);
-            if (snap.exists()) return;
+            if (snap.exists()) {
+                markAsAttended();
+                return;
+            }
 
             const payload = {
                 uid: currentUser.uid,
-                userName: currentUser.displayName,
+                userName: currentUser.displayName || "Tanpa Nama",
                 userEmail: currentUser.email,
                 sessionId: sessionId,
                 channel: channel,
@@ -251,11 +342,10 @@
             const iconEl = document.getElementById('attendance-icon');
             
             statusEl.innerText = "Hadir (Tercatat)";
-            statusEl.classList.remove('text-slate-800');
-            statusEl.classList.add('text-green-600');
+            statusEl.className = "text-sm font-bold text-emerald-600 transition-colors";
             
-            iconEl.classList.remove('bg-slate-100', 'text-slate-400');
-            iconEl.classList.add('bg-green-50', 'text-green-600');
+            iconEl.className = "w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 transition-colors duration-300 shadow-sm";
+            iconEl.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
         }
     </script>
 </body>
