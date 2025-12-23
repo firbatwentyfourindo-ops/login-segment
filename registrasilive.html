@@ -71,7 +71,7 @@
         <!-- Bagian 1: Opsi Login -->
         <div id="auth-section" class="text-center">
             <div class="animate__animated animate__fadeInDown">
-                <!-- Logo Baru dengan Animasi Rotate 3D -->
+                <!-- Logo Grecia dengan Animasi Rotate 3D -->
                 <div class="logo-3d-rotate w-24 h-24 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-100 p-2">
                     <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia.png" alt="Grecia Logo" class="w-full h-full object-contain">
                 </div>
@@ -148,40 +148,7 @@
         <!-- Bagian 3: Loading -->
         <div id="loading-section" class="hidden text-center py-16 animate__animated animate__fadeIn">
             <div class="loader mx-auto mb-6"></div>
-            <p class="text-sm text-gray-500 font-bold tracking-wide">Mencadangkan data ke cloud...</p>
-        </div>
-
-        <!-- Bagian 4: Berhasil -->
-        <div id="success-section" class="hidden text-center py-2 animate__animated animate__zoomIn">
-            <div class="w-16 h-16 bg-green-500 rounded-3xl flex items-center justify-center mx-auto mb-6 rotate-6 shadow-xl shadow-green-100">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <h2 class="text-2xl font-extrabold text-gray-900 mb-2">Registrasi Selesai!</h2>
-            <p class="text-sm text-gray-500 mb-10 leading-relaxed font-medium">Anda telah terdaftar secara resmi. Pilih platform live yang Anda inginkan di bawah ini:</p>
-            
-            <div class="space-y-4">
-                <a href="https://zoom.us/j/your_zoom_id" target="_blank" class="flex items-center justify-between bg-blue-600 p-5 rounded-2xl text-white hover:bg-blue-700 transition-all group shadow-lg shadow-blue-50">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-white/20 p-2 rounded-xl">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16.5V7.5L16 12L21 16.5ZM4 7C2.89543 7 2 7.89543 2 9V15C2 16.1046 2.89543 17 4 17H12C13.1046 17 14 16.1046 14 15V9C14 7.89543 13.1046 7 12 7H4Z"></path></svg>
-                        </div>
-                        <span class="font-bold text-sm">Zoom Live Session</span>
-                    </div>
-                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-
-                <a href="https://youtube.com/live/your_youtube_id" target="_blank" class="flex items-center justify-between bg-white border border-gray-100 p-5 rounded-2xl text-gray-800 hover:bg-gray-50 transition-all group shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-red-50 p-2 rounded-xl text-red-600">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path></svg>
-                        </div>
-                        <span class="font-bold text-sm">YouTube Live Stream</span>
-                    </div>
-                    <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-            </div>
+            <p class="text-sm text-gray-500 font-bold tracking-wide">Mendaftarkan Anda...</p>
         </div>
     </div>
 
@@ -209,7 +176,6 @@
         const authSection = document.getElementById('auth-section');
         const formSection = document.getElementById('form-section');
         const loadingSection = document.getElementById('loading-section');
-        const successSection = document.getElementById('success-section');
         const submitErrorMsg = document.getElementById('submit-error-msg');
         
         const btnLoginGoogle = document.getElementById('btn-login');
@@ -232,7 +198,6 @@
         const resetUI = () => {
             authSection.classList.remove('hidden');
             formSection.classList.add('hidden');
-            successSection.classList.add('hidden');
             loadingSection.classList.add('hidden');
         };
 
@@ -294,15 +259,16 @@
                     submittedAt: serverTimestamp()
                 });
 
+                // Redirect ke Dashboard setelah berhasil simpan data
                 setTimeout(() => {
-                    loadingSection.classList.add('hidden');
-                    successSection.classList.remove('hidden');
-                }, 1200);
+                    window.location.href = 'dashboard-greciaedu.html';
+                }, 1000);
+
             } catch (error) {
                 console.error("Firestore Error:", error);
                 loadingSection.classList.add('hidden');
                 formSection.classList.remove('hidden');
-                submitErrorMsg.innerText = "Gagal menyimpan data. Coba lagi nanti.";
+                submitErrorMsg.innerText = "Gagal mengirim pendaftaran. Silakan coba lagi.";
                 submitErrorMsg.classList.remove('hidden');
             }
         });
