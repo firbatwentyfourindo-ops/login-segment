@@ -3,13 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Administrator - Event Grecia</title>
+    <title>Premium Admin | GreciaEdu</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --sidebar-bg: #0f172a;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; 
+            color: #0f172a; 
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link {
+            @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer mb-1;
+            color: #94a3b8;
+        }
+
+        .nav-link:hover {
+            @apply bg-slate-800 text-white;
+        }
+
+        .nav-link.active {
+            @apply bg-blue-600 text-white shadow-lg shadow-blue-900/20;
+        }
+
+        /* Card Styling */
+        .stat-card {
+            @apply bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all duration-300;
+        }
+
+        .stat-card:hover {
+            @apply shadow-xl shadow-slate-200/50 -translate-y-1 border-blue-100;
+        }
+
+        /* Table Styling */
+        .table-container {
+            @apply bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden;
+        }
+
+        table { @apply w-full text-left border-collapse; }
+        th { 
+            @apply px-6 py-4 bg-slate-50/80 text-[11px] font-extrabold text-slate-500 uppercase tracking-widest border-b border-slate-100;
+        }
+        td { 
+            @apply px-6 py-4 border-b border-slate-50 text-sm text-slate-600 align-middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { @apply bg-slate-50/50; }
+
+        /* Form Styling */
+        .input-group label {
+            @apply block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1;
+        }
+
+        .modern-input {
+            @apply w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm transition-all duration-200 outline-none;
+        }
+
+        .modern-input:focus {
+            @apply border-blue-500 ring-4 ring-blue-500/10 shadow-sm;
+        }
+
+        /* Animations */
+        .page-transition {
+            animation: slideUp 0.4s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 flex flex-col p-6 shrink-0 z-20">
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-10 h-10 bg-gradient-to-tr from-blue-700 to-blue-400 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/40">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-white font-extrabold text-lg tracking-tight">Grecia<span class="text-blue-400">Edu</span></h1>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Administrator</p>
+            </div>
+        </div>
+
+        <nav class="flex-1">
+            <div onclick="switchTab('general')" id="nav-general" class="nav-link active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Ringkasan
+            </div>
+            <div onclick="switchTab('viewers')" id="nav-viewers" class="nav-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Peserta Hadir
+            </div>
+            <div onclick="switchTab('members')" id="nav-members" class="nav-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Database User
+            </div>
+            <div onclick="switchTab('connect')" id="nav-connect" class="nav-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                Kontrol Sesi
+            </div>
+        </nav>
+
+        <div class="mt-auto bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">System Synchronized</span>
+            </div>
+            <p class="text-[9px] text-slate-500 leading-tight">Terhubung ke Firebase Realtime Database v11.6</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Header -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+            <div>
+                <h2 id="page-title" class="text-xl font-bold text-slate-900 tracking-tight">Ringkasan Dashboard</h2>
+                <p id="page-subtitle" class="text-xs text-slate-500">Pantau aktivitas platform secara real-time.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="session-badge" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl border border-blue-100 text-[10px] font-extrabold uppercase tracking-widest">
+                    Session: LOADING...
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-8 no-scrollbar bg-slate-50/50">
+            
+            <!-- Tab: General -->
+            <section id="tab-general" class="page-transition space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stat-card">
+                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kehadiran Sesi Ini</p>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <h3 id="stat-viewers" class="text-3xl font-extrabold text-slate-900">0</h3>
+                            <span class="text-xs font-bold text-green-500">Live</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total User Terdaftar</p>
+                        <h3 id="stat-members" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                    </div>
+                    <div class="stat-card">
+                        <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Log Pembaruan</p>
+                        <h3 id="stat-history" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
+                    </div>
+                    <div class="stat-card bg-gradient-to-br from-blue-600 to-indigo-700 border-none shadow-blue-200/50">
+                        <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center text-white mb-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <p class="text-xs font-semibold text-blue-100 uppercase tracking-wider">Efisiensi Sistem</p>
+                        <h3 class="text-3xl font-extrabold text-white mt-1">99.9%</h3>
+                    </div>
+                </div>
+
+                <!-- Empty State Chart Area -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-10 flex flex-col items-center justify-center min-h-[400px] border-dashed">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-10 h-10 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    </div>
+                    <h4 class="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Data Visualization Module</h4>
+                    <p class="text-slate-300 text-sm mt-2">Menunggu integrasi modul grafik pihak ketiga...</p>
+                </div>
+            </section>
+
+            <!-- Tab: Viewers -->
+            <section id="tab-viewers" class="hidden page-transition space-y-6">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Informasi User</th>
+                                <th>Saluran Akses</th>
+                                <th>Waktu Check-in</th>
+                                <th>Status Sesi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewer-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab: Members -->
+            <section id="tab-members" class="hidden page-transition space-y-6">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Lengkap</th>
+                                <th>Email Address</th>
+                                <th>Metode Login</th>
+                                <th>Waktu Pendaftaran</th>
+                            </tr>
+                        </thead>
+                        <tbody id="member-list"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab: Connect -->
+            <section id="tab-connect" class="hidden page-transition grid grid-cols-12 gap-8">
+                <!-- Control Panel -->
+                <div class="col-span-12 lg:col-span-4 space-y-6">
+                    <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
+                            Update Live Session
+                        </h3>
+                        <form id="connect-form" class="space-y-5">
+                            <div class="input-group">
+                                <label>Kode Sesi Baru</label>
+                                <input type="text" id="c-session" placeholder="CONTOH: WEBINAR-A" required class="modern-input font-mono uppercase tracking-widest text-blue-600 font-bold">
+                            </div>
+                            <div class="input-group">
+                                <label>YouTube Link</label>
+                                <input type="url" id="c-yt" placeholder="https://youtube.com/live/..." required class="modern-input">
+                            </div>
+                            <div class="input-group">
+                                <label>Zoom Meeting Link</label>
+                                <input type="url" id="c-zm" placeholder="https://zoom.us/j/..." required class="modern-input">
+                            </div>
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl shadow-slate-200/50 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                Broadcast Sekarang
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="col-span-12 lg:col-span-8">
+                    <div class="table-container">
+                        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                            <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-widest">History Update</h4>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Terakhir Update Berada di Atas</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Akses Links</th>
+                                    <th>Sesi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Konfigurasi Firebase Anda (Sama seperti sebelumnya)
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
             authDomain: "registrasi-user-grecia.firebaseapp.com",
@@ -20,136 +300,158 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = firebaseConfig.appId;
 
-        // SUPER ADMIN WHITELIST (Hanya mereka yang bisa mendaftarkan admin lain)
-        const SUPER_ADMINS = ["admin@grecia.com", "your-email@gmail.com"];
+        let activeSessionId = "";
 
-        const authView = document.getElementById('auth-view');
-        const regView = document.getElementById('reg-view');
-        const loading = document.getElementById('loading');
-        const statusMsg = document.getElementById('status-msg');
+        // Navigation
+        window.switchTab = (id) => {
+            const sections = {
+                'general': ['Ringkasan Dashboard', 'Pantau aktivitas platform secara real-time.'],
+                'viewers': ['Daftar Kehadiran Peserta', 'Data peserta yang melakukan klik link akses hari ini.'],
+                'members': ['Database Pengguna', 'Seluruh data user yang pernah mendaftar di platform.'],
+                'connect': ['Kontrol Sesi Aktif', 'Atur link YouTube dan Zoom untuk halaman user.']
+            };
 
-        // 1. Monitor Status Login
-        onAuthStateChanged(auth, async (user) => {
-            loading.classList.add('hidden');
-            if (user) {
-                // Cek apakah dia Super Admin
-                if (SUPER_ADMINS.includes(user.email)) {
-                    showRegistrationForm(user.email);
-                } else {
-                    // Cek apakah dia admin biasa di Firestore
-                    const adminSnap = await getDoc(doc(db, `artifacts/${appId}/public/data/admins`, user.email.replace('.', '_')));
-                    if (adminSnap.exists()) {
-                        window.location.href = "administrator.html";
-                    } else {
-                        statusMsg.innerText = "Email Anda tidak terdaftar sebagai Administrator.";
-                        authView.classList.remove('hidden');
-                    }
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(`nav-${id}`).classList.add('active');
+            
+            document.getElementById('page-title').innerText = sections[id][0];
+            document.getElementById('page-subtitle').innerText = sections[id][1];
+        };
+
+        // UI Helpers
+        const formatTime = (date) => {
+            if(!date) return '-';
+            return new Intl.DateTimeFormat('id-ID', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }).format(date);
+        };
+
+        // Real-time Data
+        function initData() {
+            // Settings & Global Session
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    activeSessionId = data.sessionId || "ID-UNKNOWN";
+                    document.getElementById('session-badge').innerText = `Session: ${activeSessionId}`;
                 }
-            } else {
-                authView.classList.remove('hidden');
-                regView.classList.add('hidden');
-            }
-        });
+            });
 
-        function showRegistrationForm(email) {
-            authView.classList.add('hidden');
-            regView.classList.remove('hidden');
-            document.getElementById('admin-identifier').innerText = `Login sebagai Super Admin: ${email}`;
+            // Attendance
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
+                const list = document.getElementById('viewer-list');
+                list.innerHTML = "";
+                
+                const currentCount = snap.docs.filter(d => d.data().sessionId === activeSessionId).length;
+                document.getElementById('stat-viewers').innerText = currentCount;
+
+                snap.forEach(d => {
+                    const it = d.data();
+                    const isCurrent = it.sessionId === activeSessionId;
+                    
+                    list.innerHTML += `
+                        <tr class="transition-colors ${isCurrent ? 'bg-blue-50/20' : ''}">
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-[10px] text-slate-500">
+                                        ${(it.userName || 'U').charAt(0)}
+                                    </div>
+                                    <span class="font-bold text-slate-800 tracking-tight">${it.userName || 'Anonymous'}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest ${it.channel === 'YOUTUBE' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}">
+                                    ${it.channel || 'LINK'}
+                                </span>
+                            </td>
+                            <td class="font-medium text-slate-500 text-xs">${formatTime(it.clickedAt?.toDate())}</td>
+                            <td>
+                                <span class="text-[9px] font-bold px-2 py-0.5 border rounded uppercase ${isCurrent ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-slate-200 text-slate-400'}">
+                                    ${it.sessionId || 'N/A'}
+                                </span>
+                            </td>
+                        </tr>`;
+                });
+            });
+
+            // Registrations
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), (snap) => {
+                document.getElementById('stat-members').innerText = snap.size;
+                const list = document.getElementById('member-list');
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const it = d.data();
+                    list.innerHTML += `<tr>
+                        <td><span class="font-bold text-slate-800">${it.fullName || '-'}</span></td>
+                        <td><span class="text-slate-500">${it.email || '-'}</span></td>
+                        <td><span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-lg">${it.method || 'AUTH'}</span></td>
+                        <td class="text-[11px] font-mono text-slate-400">${it.submittedAt?.toDate().toLocaleDateString('id-ID') || '-'}</td>
+                    </tr>`;
+                });
+            });
+
+            // History
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'history'), (snap) => {
+                document.getElementById('stat-history').innerText = snap.size;
+                const list = document.getElementById('history-list');
+                list.innerHTML = "";
+                
+                const sorted = snap.docs.map(d => ({id: d.id, ...d.data()}))
+                    .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+                sorted.forEach(it => {
+                    const ts = it.createdAt?.toDate().toLocaleString('id-ID', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    list.innerHTML += `<tr>
+                        <td class="text-[11px] font-bold text-slate-400 uppercase">${ts || '-'}</td>
+                        <td>
+                            <div class="flex gap-2">
+                                <a href="${it.youtubeUrl}" target="_blank" class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg></a>
+                                <a href="${it.zoomUrl}" target="_blank" class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 hover:bg-blue-600 hover:text-white transition-all"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></a>
+                            </div>
+                        </td>
+                        <td><span class="font-black text-slate-900 font-mono tracking-tighter uppercase">${it.sessionId}</span></td>
+                    </tr>`;
+                });
+            });
         }
 
-        window.loginAdmin = async () => {
-            const provider = new GoogleAuthProvider();
-            try { 
-                statusMsg.innerText = "Sedang memverifikasi...";
-                await signInWithPopup(auth, provider); 
-            } catch (e) { 
-                statusMsg.innerText = "Gagal Login: " + e.message; 
-            }
-        };
-
-        window.handleAdminRegistration = async (event) => {
-            event.preventDefault();
-            const targetEmail = document.getElementById('new-admin-email').value;
-            const adminName = document.getElementById('new-admin-name').value;
+        // Form Submit
+        document.getElementById('connect-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = "UPDATING...";
             
-            if (!targetEmail || !adminName) return alert("Semua data wajib diisi");
+            const payload = {
+                sessionId: document.getElementById('c-session').value.trim().toUpperCase(),
+                youtubeUrl: document.getElementById('c-yt').value.trim(),
+                zoomUrl: document.getElementById('c-zm').value.trim(),
+                updatedAt: serverTimestamp()
+            };
 
             try {
-                await setDoc(doc(db, `artifacts/${appId}/public/data/admins`, targetEmail.replace('.', '_')), {
-                    email: targetEmail,
-                    name: adminName,
-                    role: "admin",
-                    addedBy: auth.currentUser.email,
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), payload, { merge: true });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), {
+                    ...payload,
                     createdAt: serverTimestamp()
                 });
-
-                alert(`Berhasil mendaftarkan ${targetEmail} sebagai Admin baru.`);
-                event.target.reset();
-            } catch (e) {
-                alert("Gagal mendaftar: " + e.message);
+                alert("Berhasil! Sesi sekarang aktif: " + payload.sessionId);
+                e.target.reset();
+            } catch (err) {
+                console.error(err);
+                alert("Gagal melakukan update.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `Broadcast Sekarang`;
             }
         };
 
-        window.logout = () => signOut(auth).then(() => window.location.reload());
+        window.onload = initData;
     </script>
-</head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-6 font-sans">
-
-    <!-- Loading -->
-    <div id="loading" class="text-white flex flex-col items-center">
-        <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-sm font-medium">Memuat Portal Admin...</p>
-    </div>
-
-    <!-- VIEW 1: LOGIN (Hanya tombol Login) -->
-    <div id="auth-view" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl text-center">
-        <div class="mb-8">
-            <div class="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span class="text-4xl">🔐</span>
-            </div>
-            <h1 class="text-2xl font-black text-slate-800">Admin Login</h1>
-            <p class="text-slate-500 mt-2 text-sm">Masuk untuk mengelola event atau mendaftarkan admin baru.</p>
-        </div>
-
-        <button onclick="loginAdmin()" class="w-full bg-slate-800 text-white flex items-center justify-center gap-3 p-4 rounded-xl font-bold hover:bg-slate-900 transition shadow-lg">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
-            Masuk dengan Google
-        </button>
-        
-        <p id="status-msg" class="mt-6 text-xs font-bold text-red-500 uppercase tracking-tighter"></p>
-    </div>
-
-    <!-- VIEW 2: REGISTER (Hanya muncul jika yang login adalah Super Admin) -->
-    <div id="reg-view" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl">
-        <div class="mb-6">
-            <h2 class="text-2xl font-black text-slate-800">Daftarkan Admin</h2>
-            <p id="admin-identifier" class="text-indigo-600 text-[10px] font-bold uppercase mt-1"></p>
-        </div>
-
-        <form onsubmit="handleAdminRegistration(event)" class="space-y-4">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 ml-1">Nama Lengkap</label>
-                <input type="text" id="new-admin-name" required class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition bg-slate-50">
-            </div>
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1 ml-1">Email Google Admin</label>
-                <input type="email" id="new-admin-email" required class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition bg-slate-50" placeholder="admin@gmail.com">
-            </div>
-            
-            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-black hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 mt-2">
-                Simpan Admin Baru
-            </button>
-        </form>
-        
-        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3 text-center">
-            <a href="administrator.html" class="text-indigo-600 font-extrabold text-sm hover:underline"> Ke Dashboard Admin &rarr;</a>
-            <button onclick="logout()" class="text-slate-400 font-bold text-xs uppercase tracking-widest hover:text-red-500">Keluar / Ganti Akun</button>
-        </div>
-    </div>
-
 </body>
 </html>
