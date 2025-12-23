@@ -3,162 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Manajemen GreciaEdu</title>
+    <title>Admin Dashboard | GreciaEdu</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .sidebar-item { @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer; }
-        .sidebar-item.active { @apply bg-blue-600 text-white shadow-lg shadow-blue-200; }
-        .sidebar-item.inactive { @apply text-slate-500 hover:bg-slate-100; }
-        .glass-card { @apply bg-white border border-slate-200 rounded-2xl p-6 shadow-sm; }
-        .input-field { @apply w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         
+        .sidebar-item { @apply flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-bold transition-all cursor-pointer uppercase tracking-wider; }
+        .sidebar-item.active { @apply bg-blue-600 text-white shadow-md; }
+        .sidebar-item.inactive { @apply text-slate-400 hover:bg-slate-200 hover:text-slate-600; }
+        
+        .glass-card { @apply bg-white border border-slate-200 rounded-xl p-4 shadow-sm; }
+        .input-slim { @apply w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 transition-all; }
+        
+        table { @apply w-full text-left text-[11px]; }
+        th { @apply bg-slate-50 p-3 text-slate-400 uppercase tracking-tighter font-bold border-b border-slate-100; }
+        td { @apply p-3 border-b border-slate-50 text-slate-600; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="h-screen overflow-hidden flex">
 
     <!-- Screen: Login -->
-    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 text-center border border-slate-100">
-            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-12 mx-auto mb-8">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Portal</h2>
+    <div id="screen-login" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
+        <div class="w-full max-w-xs bg-white rounded-3xl p-8 shadow-2xl text-center border border-slate-200">
+            <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-10 mx-auto mb-6">
+            <h2 class="text-lg font-bold mb-1">Admin Portal</h2>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-8">GreciaEdu Management</p>
             
-            <div id="login-step-1" class="fade-in">
-                <p class="text-slate-500 text-sm mb-10">Verifikasi Identitas Administrator</p>
-                <button id="btn-google-login" class="w-full flex items-center justify-center gap-4 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
-                    <svg class="w-6 h-6" viewBox="0 0 48 48">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                    </svg>
-                    Masuk dengan Google
-                </button>
-            </div>
-
-            <div id="login-step-2" class="hidden fade-in text-left">
-                <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl mb-6">
-                    <img id="login-avatar" src="" class="w-10 h-10 rounded-full border-2 border-white">
-                    <div class="overflow-hidden">
-                        <p id="login-user-name" class="text-xs font-bold text-slate-800 truncate"></p>
-                        <p id="login-user-email" class="text-[10px] text-blue-600 font-medium truncate"></p>
-                    </div>
-                </div>
-                <form id="admin-verify-form" class="space-y-4">
-                    <input type="password" id="verify-pass" required class="input-field mt-1" placeholder="Masukkan Password Admin">
-                    <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all">VERIFIKASI & MASUK</button>
-                </form>
-            </div>
-            <p id="login-error" class="text-red-500 text-[10px] font-bold mt-4 hidden uppercase tracking-widest">Akses Ditolak</p>
+            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 text-xs font-bold py-3 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg>
+                Masuk via Google
+            </button>
+            <p id="login-error" class="text-red-500 text-[9px] font-bold mt-4 hidden uppercase">Sesi Tidak Valid</p>
         </div>
     </div>
 
-    <!-- Screen: Dashboard -->
-    <div id="screen-dashboard" class="hidden flex h-screen overflow-hidden">
-        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 overflow-y-auto no-scrollbar">
-            <div class="mb-10 text-center">
-                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-8 mx-auto mb-4">
-                <div id="admin-info" class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
-                    <img id="admin-photo" src="" class="w-8 h-8 rounded-full border border-white">
-                    <div class="text-left overflow-hidden">
-                        <p id="display-admin-name" class="text-xs font-bold text-slate-800 truncate">Admin</p>
-                        <p id="display-admin-email" class="text-[9px] text-slate-400 truncate">admin@grecia.edu</p>
-                    </div>
-                </div>
+    <!-- Screen: Main Dashboard -->
+    <div id="screen-dashboard" class="hidden flex flex-1 h-screen overflow-hidden">
+        
+        <!-- Sidebar Ramping -->
+        <aside class="w-56 bg-white border-r border-slate-200 flex flex-col p-4 shrink-0">
+            <div class="mb-8 flex items-center gap-2 px-2">
+                <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" class="h-6">
+                <span class="text-[10px] font-extrabold text-blue-600 tracking-tighter">ADMIN</span>
             </div>
 
-            <nav class="space-y-2 flex-1">
+            <nav class="space-y-1 flex-1">
                 <div onclick="switchTab('general')" id="nav-general" class="sidebar-item active">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    Statistik Utama
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path></svg>
+                    General
                 </div>
                 <div onclick="switchTab('viewers')" id="nav-viewers" class="sidebar-item inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    Kehadiran Peserta
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    Viewers
+                </div>
+                <div onclick="switchTab('members')" id="nav-members" class="sidebar-item inactive">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Members
                 </div>
                 <div onclick="switchTab('connect')" id="nav-connect" class="sidebar-item inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Update Pelatihan
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                    Connect
                 </div>
             </nav>
 
-            <button onclick="handleLogout()" class="mt-auto w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100">Keluar Sesi</button>
+            <div class="pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2 mb-4 px-2">
+                    <img id="admin-photo" src="" class="w-6 h-6 rounded-full border border-slate-200">
+                    <div class="overflow-hidden">
+                        <p id="admin-name" class="text-[9px] font-bold text-slate-700 truncate">Admin</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="sidebar-item text-red-500 hover:bg-red-50 hover:text-red-600 w-full">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Logout
+                </button>
+            </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0">
-                <h2 id="tab-title" class="text-lg font-bold text-slate-800">Statistik Utama</h2>
-                <div id="system-status" class="flex items-center gap-2">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistem Online</span>
-                </div>
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+                <h2 id="page-title" class="text-xs font-extrabold text-slate-800 uppercase tracking-tighter">General Overview</h2>
+                <div id="countdown" class="text-[9px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100 uppercase tracking-widest">Sesi Valid: ...</div>
             </header>
 
-            <div id="content-area" class="flex-1 overflow-y-auto p-8 no-scrollbar">
+            <div id="content-area" class="flex-1 overflow-y-auto p-6 no-scrollbar">
                 
                 <!-- Tab: General -->
-                <section id="tab-general" class="tab-pane space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <section id="tab-general" class="fade-in space-y-4">
+                    <div class="grid grid-cols-4 gap-4">
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Kehadiran Hari Ini</p>
-                            <h3 class="text-3xl font-bold" id="stat-attendance">0</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Total Viewers</p>
+                            <h3 id="stat-viewers" class="text-xl font-bold">0</h3>
                         </div>
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Pendaftar</p>
-                            <h3 class="text-3xl font-bold" id="stat-registrations">0</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Total Members</p>
+                            <h3 id="stat-members" class="text-xl font-bold">0</h3>
                         </div>
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Status Streaming</p>
-                            <h3 class="text-3xl font-bold text-blue-600" id="stat-streaming">Aktif</h3>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Histori Koneksi</p>
+                            <h3 id="stat-history" class="text-xl font-bold">0</h3>
                         </div>
+                        <div class="glass-card">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">Uptime Sistem</p>
+                            <h3 class="text-xl font-bold text-green-500">Live</h3>
+                        </div>
+                    </div>
+                    <div class="glass-card min-h-[200px] flex items-center justify-center text-slate-300 text-[10px] font-bold uppercase tracking-[0.2em]">
+                        Statistik Grafik Data Terintegrasi
                     </div>
                 </section>
 
                 <!-- Tab: Viewers -->
-                <section id="tab-viewers" class="tab-pane hidden">
-                    <div class="glass-card overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase">
-                                    <tr>
-                                        <th class="px-6 py-4">Nama Peserta</th>
-                                        <th class="px-6 py-4">Waktu Masuk</th>
-                                        <th class="px-6 py-4">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="attendance-list" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
+                <section id="tab-viewers" class="hidden fade-in space-y-4">
+                    <div class="glass-card overflow-hidden !p-0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Peserta</th>
+                                    <th>Email</th>
+                                    <th>Waktu Hadir</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewer-list"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Tab: Members -->
+                <section id="tab-members" class="hidden fade-in space-y-4">
+                    <div class="glass-card overflow-hidden !p-0">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nama Lengkap</th>
+                                    <th>Email</th>
+                                    <th>Domisili</th>
+                                    <th>Sumber Info</th>
+                                    <th>Tgl Daftar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="member-list"></tbody>
+                        </table>
                     </div>
                 </section>
 
                 <!-- Tab: Connect -->
-                <section id="tab-connect" class="tab-pane hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="glass-card">
-                        <h4 class="font-bold mb-6 text-sm">Update Konten Pelatihan</h4>
-                        <form id="pelatihan-form" class="space-y-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Judul Sesi</label>
-                                <input type="text" id="p-title" required class="input-field mt-1" placeholder="Contoh: Webinar Strategi Marketing">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">URL YouTube Live</label>
-                                <input type="url" id="p-yt" required class="input-field mt-1" placeholder="https://youtube.com/live/...">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">URL Zoom Meeting</label>
-                                <input type="url" id="p-zm" required class="input-field mt-1" placeholder="https://zoom.us/j/...">
-                            </div>
-                            <button type="submit" id="btn-publish" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">PUBLIKASIKAN SEKARANG</button>
-                        </form>
+                <section id="tab-connect" class="hidden fade-in grid grid-cols-12 gap-6">
+                    <div class="col-span-4 space-y-4">
+                        <div class="glass-card">
+                            <h4 class="text-[10px] font-extrabold mb-4 uppercase text-blue-600">Update Sesi Baru</h4>
+                            <form id="connect-form" class="space-y-3">
+                                <input type="text" id="c-title" placeholder="Judul Pelatihan" required class="input-slim">
+                                <input type="url" id="c-yt" placeholder="Link YouTube Baru" required class="input-slim">
+                                <input type="url" id="c-zm" placeholder="Link Zoom Baru" required class="input-slim">
+                                <button type="submit" class="w-full bg-slate-900 text-white text-[10px] font-bold py-3 rounded-lg hover:bg-blue-600 transition-all uppercase tracking-widest">Publish Link</button>
+                            </form>
+                        </div>
                     </div>
-                    
-                    <div class="glass-card">
-                        <h4 class="font-bold mb-6 text-sm">Histori Publikasi</h4>
-                        <div id="history-list" class="space-y-3"></div>
+                    <div class="col-span-8">
+                        <div class="glass-card overflow-hidden !p-0">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Judul & Tanggal</th>
+                                        <th>YouTube</th>
+                                        <th>Zoom</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-list"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
 
@@ -169,7 +193,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
@@ -186,162 +210,153 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
 
-        let currentGoogleUser = null;
-        let isVerified = localStorage.getItem('grecia_admin_session') === 'active';
+        const SESSION_TIMEOUT = 6 * 60 * 60 * 1000; // 6 Jam
 
-        // --- AUTH LOGIC ---
-        const loginBtn = document.getElementById('btn-google-login');
-        const verifyForm = document.getElementById('admin-verify-form');
-        const errorMsg = document.getElementById('login-error');
-
-        loginBtn.onclick = async () => {
-            try {
-                const res = await signInWithPopup(auth, provider);
-                currentGoogleUser = res.user;
-                document.getElementById('login-step-1').classList.add('hidden');
-                document.getElementById('login-step-2').classList.remove('hidden');
-                document.getElementById('login-avatar').src = res.user.photoURL;
-                document.getElementById('login-user-name').innerText = res.user.displayName;
-                document.getElementById('login-user-email').innerText = res.user.email;
-            } catch (e) { console.error(e); }
-        };
-
-        verifyForm.onsubmit = (e) => {
-            e.preventDefault();
-            const pass = document.getElementById('verify-pass').value;
-            // Password admin statis
-            if (pass === "grecia123") {
-                isVerified = true;
-                localStorage.setItem('grecia_admin_session', 'active');
-                initDashboard(currentGoogleUser);
-            } else {
-                errorMsg.classList.remove('hidden');
+        // --- AUTH & AUTO LOGOUT ---
+        const checkSession = () => {
+            const loginTime = localStorage.getItem('admin_login_time');
+            if (loginTime && (Date.now() - parseInt(loginTime) > SESSION_TIMEOUT)) {
+                handleLogout();
             }
         };
 
+        setInterval(checkSession, 60000); // Cek tiap menit
+
         onAuthStateChanged(auth, (user) => {
-            if (user && isVerified) {
-                initDashboard(user);
+            if (user) {
+                if (!localStorage.getItem('admin_login_time')) {
+                    localStorage.setItem('admin_login_time', Date.now().toString());
+                }
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('screen-dashboard').classList.remove('hidden');
+                document.getElementById('admin-photo').src = user.photoURL;
+                document.getElementById('admin-name').innerText = user.displayName;
+                initData();
             } else {
                 document.getElementById('screen-login').classList.remove('hidden');
                 document.getElementById('screen-dashboard').classList.add('hidden');
+                localStorage.removeItem('admin_login_time');
             }
         });
 
-        window.handleLogout = async () => {
-            isVerified = false;
-            localStorage.removeItem('grecia_admin_session');
-            await signOut(auth);
+        document.getElementById('btn-google-login').onclick = () => signInWithPopup(auth, provider);
+
+        window.handleLogout = () => {
+            localStorage.removeItem('admin_login_time');
+            signOut(auth);
         };
 
-        // --- DASHBOARD LOGIC ---
-        function initDashboard(user) {
-            document.getElementById('screen-login').classList.add('hidden');
-            document.getElementById('screen-dashboard').classList.remove('hidden');
-            document.getElementById('display-admin-name').innerText = user.displayName;
-            document.getElementById('display-admin-email').innerText = user.email;
-            document.getElementById('admin-photo').src = user.photoURL;
-            startListeners();
-        }
-
+        // --- TAB NAVIGATION ---
         window.switchTab = (id) => {
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`tab-${id}`).classList.remove('hidden');
             document.querySelectorAll('.sidebar-item').forEach(i => i.classList.replace('active', 'inactive'));
             document.getElementById(`nav-${id}`).classList.replace('inactive', 'active');
-            document.getElementById('tab-title').innerText = id === 'general' ? 'Statistik Utama' : (id === 'viewers' ? 'Kehadiran Peserta' : 'Update Pelatihan');
+            document.getElementById('page-title').innerText = id.charAt(0).toUpperCase() + id.slice(1) + " Management";
         };
 
-        // --- DATA LISTENERS ---
-        function startListeners() {
-            // Stats & Attendance
-            const attCol = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
-            onSnapshot(attCol, (snap) => {
-                document.getElementById('stat-attendance').innerText = snap.size;
-                const list = document.getElementById('attendance-list');
+        // --- DATA SYNC ---
+        function initData() {
+            // Stats: Viewers
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
+                document.getElementById('stat-viewers').innerText = snap.size;
+                const list = document.getElementById('viewer-list');
                 list.innerHTML = "";
                 snap.forEach(d => {
-                    const item = d.data();
-                    list.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-700">${item.userName}</td>
-                            <td class="px-6 py-4 text-slate-400 font-mono">${item.time || '-'}</td>
-                            <td class="px-6 py-4 text-slate-400">${item.userEmail || '-'}</td>
-                        </tr>
-                    `;
+                    const it = d.data();
+                    list.innerHTML += `<tr>
+                        <td class="font-bold text-slate-800">${it.userName}</td>
+                        <td class="text-slate-400">${it.userEmail}</td>
+                        <td class="font-mono text-blue-600">${it.time || '-'}</td>
+                        <td><span class="bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-[8px] font-bold">ONLINE</span></td>
+                    </tr>`;
                 });
             });
 
-            // Total Registrations
-            const regCol = collection(db, 'artifacts', appId, 'public', 'data', 'registrations');
-            onSnapshot(regCol, (snap) => {
-                document.getElementById('stat-registrations').innerText = snap.size;
+            // Stats: Members
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), (snap) => {
+                document.getElementById('stat-members').innerText = snap.size;
+                const list = document.getElementById('member-list');
+                list.innerHTML = "";
+                snap.forEach(d => {
+                    const it = d.data();
+                    const date = it.submittedAt?.toDate().toLocaleDateString('id-ID') || '-';
+                    list.innerHTML += `<tr>
+                        <td class="font-bold text-slate-800">${it.fullName}</td>
+                        <td class="text-slate-400">${it.email}</td>
+                        <td class="text-slate-500">${it.address}</td>
+                        <td class="font-bold text-slate-400 uppercase">${it.referralSource}</td>
+                        <td class="text-[10px] font-mono">${date}</td>
+                    </tr>`;
+                });
             });
 
-            // History
-            const histCol = collection(db, 'artifacts', appId, 'public', 'data', 'history');
-            onSnapshot(histCol, (snap) => {
+            // Stats: History Connect
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'history'), (snap) => {
+                document.getElementById('stat-history').innerText = snap.size;
                 const list = document.getElementById('history-list');
                 list.innerHTML = "";
                 snap.forEach(d => {
-                    const item = d.data();
-                    list.innerHTML += `
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center group">
-                            <div class="overflow-hidden">
-                                <h5 class="font-bold text-xs truncate">${item.title}</h5>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Baru'}</p>
-                            </div>
-                            <button onclick="window.deleteEntry('${d.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-bold">HAPUS</button>
-                        </div>
-                    `;
+                    const it = d.data();
+                    list.innerHTML += `<tr>
+                        <td><p class="font-bold text-slate-800">${it.title}</p><p class="text-[9px] text-slate-400">${it.date}</p></td>
+                        <td><a href="${it.youtubeUrl}" target="_blank" class="text-red-500 font-bold hover:underline">YT Link</a></td>
+                        <td><a href="${it.zoomUrl}" target="_blank" class="text-blue-500 font-bold hover:underline">ZM Link</a></td>
+                        <td><button onclick="deleteEntry('${d.id}')" class="text-slate-300 hover:text-red-500"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></button></td>
+                    </tr>`;
                 });
             });
         }
 
-        // --- FORM ACTION ---
-        document.getElementById('pelatihan-form').onsubmit = async (e) => {
+        // --- FORM CONNECT ---
+        document.getElementById('connect-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-publish');
-            btn.disabled = true;
-            btn.innerText = "MENYIMPAN...";
-
+            const btn = e.target.querySelector('button');
+            btn.innerText = "PUBLISHING...";
+            
             const payload = {
-                title: document.getElementById('p-title').value,
-                youtubeUrl: document.getElementById('p-yt').value,
-                zoomUrl: document.getElementById('p-zm').value,
-                date: new Date().toLocaleString('id-ID')
+                title: document.getElementById('c-title').value,
+                youtubeUrl: document.getElementById('c-yt').value,
+                zoomUrl: document.getElementById('c-zm').value,
+                date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
             };
 
             try {
-                // Update Global Settings (untuk Dashboard User)
+                // Update link aktif (untuk user dashboard)
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), {
                     youtubeUrl: payload.youtubeUrl,
                     zoomUrl: payload.zoomUrl,
                     updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                // Add to History
+                // Simpan ke history
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), {
                     ...payload,
                     createdAt: serverTimestamp()
                 });
 
                 e.target.reset();
-                alert("Berhasil dipublikasikan!");
-            } catch (err) {
-                console.error(err);
-                alert("Gagal memproses.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "PUBLIKASIKAN SEKARANG";
-            }
+            } catch (err) { console.error(err); }
+            btn.innerText = "PUBLISH LINK";
         };
 
         window.deleteEntry = async (id) => {
-            if(confirm("Hapus dari histori?")) {
+            if (confirm("Hapus histori koneksi ini?")) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
             }
         };
+
+        // --- COUNTDOWN DISPLAY ---
+        setInterval(() => {
+            const loginTime = localStorage.getItem('admin_login_time');
+            const cd = document.getElementById('countdown');
+            if (loginTime) {
+                const diff = SESSION_TIMEOUT - (Date.now() - parseInt(loginTime));
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                cd.innerText = `Sesi: ${hours}j ${mins}m lagi`;
+            }
+        }, 10000);
     </script>
 </body>
 </html>
