@@ -118,11 +118,7 @@
         </div>
 
         <div class="minimal-card rounded-[2.5rem] p-6 relative">
-             <!-- Session Badge -->
-             <div id="session-badge" class="absolute top-6 right-6 px-2 py-0.5 bg-gray-100 rounded text-[8px] font-bold text-gray-400 uppercase tracking-wider border border-gray-200">
-                OFFLINE
-            </div>
-
+            
             <!-- Tabs Navigation -->
             <div class="flex border-b border-gray-100 mb-6 mr-14">
                 <button onclick="window.switchTab('youtube')" id="tab-yt" class="tab-btn active flex-1 pb-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-blue-500">YouTube</button>
@@ -326,17 +322,6 @@
             }
         }
 
-        function updateSessionBadge(sessionId) {
-            const badge = document.getElementById('session-badge');
-            if (sessionId) {
-                badge.innerText = `SESI: ${sessionId}`;
-                badge.className = "absolute top-6 right-6 px-2 py-0.5 bg-blue-600 rounded text-[8px] font-bold text-white uppercase tracking-wider shadow-sm shadow-blue-500/30";
-            } else {
-                badge.innerText = "OFFLINE";
-                badge.className = "absolute top-6 right-6 px-2 py-0.5 bg-gray-100 rounded text-[8px] font-bold text-gray-400 uppercase tracking-wider border border-gray-200";
-            }
-        }
-
         function updateAttendanceUI(attended) {
             const pill = document.getElementById('attendance-status-pill');
             const text = document.getElementById('attendance-text');
@@ -452,14 +437,14 @@
                             document.getElementById('link-yt').href = data.youtubeUrl || '#';
                             document.getElementById('link-zm').href = data.zoomUrl || '#';
                             updateThumbnail(data.youtubeUrl);
-                            updateSessionBadge(currentSessionId);
+                            
                             updateAttendanceUI(false); 
                             checkAndAutoAttend(currentSessionId);
                         }
                         renderTabs();
                     } else {
                         currentSessionId = null;
-                        updateSessionBadge(null);
+                        
                         renderTabs();
                     }
                 }, (error) => {
