@@ -168,7 +168,7 @@
                                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Judul Pelatihan</label><input type="text" id="p-title" required class="input-field mt-1" placeholder="..."></div>
                                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link YouTube</label><input type="url" id="p-yt" required class="input-field mt-1" placeholder="..."></div>
                                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link Zoom</label><input type="url" id="p-zm" required class="input-field mt-1" placeholder="..."></div>
-                                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">PUBLIKASIKAN</button>
+                                <button type="submit" id="btn-submit-pelatihan" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">PUBLIKASIKAN</button>
                             </form>
                         </div>
                         <div class="glass-card">
@@ -187,20 +187,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIX UNTUK HOSTING LUAR ---
-        // Jika variabel global tidak ada, gunakan default atau ganti manual di sini
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "MASUKKAN_API_KEY_ANDA",
-                authDomain: "PROJECT_ANDA.firebaseapp.com",
-                projectId: "PROJECT_ANDA",
-                storageBucket: "PROJECT_ANDA.appspot.com",
-                messagingSenderId: "ID_ANDA",
-                appId: "ID_APP_ANDA"
-            };
+        // --- KONFIGURASI FIREBASE ---
+        // Konfigurasi ini telah diperbarui sesuai dengan kredensial registrasi-user-grecia
+        const firebaseConfig = {
+            apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
+            authDomain: "registrasi-user-grecia.firebaseapp.com",
+            projectId: "registrasi-user-grecia",
+            storageBucket: "registrasi-user-grecia.appspot.com",
+            messagingSenderId: "656329307818",
+            appId: "1:656329307818:web:78371ecba7b641d092c2d3"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -251,14 +249,24 @@
         // TAB SYSTEM
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+            
             document.querySelectorAll('.sidebar-item').forEach(i => { i.classList.remove('active'); i.classList.add('inactive'); });
-            document.getElementById(`nav-${tabId}`).classList.add('active');
-            document.getElementById(`nav-${tabId}`).classList.remove('inactive');
+            const nav = document.getElementById(`nav-${tabId}`);
+            if (nav) {
+                nav.classList.add('active');
+                nav.classList.remove('inactive');
+            }
+            document.getElementById('tab-title').innerText = tabId === 'general' ? 'General Analitik' : (tabId === 'viewers' ? 'Viewers & Absensi' : (tabId === 'members' ? 'Management Members' : 'Connect Pelatihan'));
         };
 
         // LISTENERS
+        let listenersActive = false;
         async function startDataListeners() {
+            if (listenersActive) return;
+            listenersActive = true;
+
             try {
                 await signInAnonymously(auth);
                 
@@ -269,82 +277,109 @@
 
                 onSnapshot(settingsDocRef, (snap) => {
                     document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
-                }, (err) => console.log("Waiting for data..."));
+                }, (err) => console.error("Error settings:", err));
 
                 onSnapshot(historyColRef, (snap) => {
                     const list = document.getElementById('history-list');
                     if (snap.empty) {
-                        list.innerHTML = `<div class="empty-state">Tidak ada data pelatihan.</div>`;
+                        list.innerHTML = `<div class="empty-state">Tidak ada histori pelatihan.</div>`;
                         return;
                     }
                     list.innerHTML = "";
                     snap.forEach(d => {
                         const item = d.data();
                         list.innerHTML += `
-                            <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center">
-                                <div>
-                                    <h5 class="font-bold text-xs">${item.title}</h5>
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date}</p>
+                            <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center group">
+                                <div class="overflow-hidden">
+                                    <h5 class="font-bold text-xs truncate">${item.title}</h5>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Tanggal tidak diketahui'}</p>
                                 </div>
-                                <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600">Hapus</button>
+                                <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600 text-xs font-bold transition-colors">Hapus</button>
                             </div>
                         `;
                     });
-                });
+                }, (err) => console.error("Error history:", err));
 
                 onSnapshot(membersColRef, (snap) => {
                     const list = document.getElementById('member-list');
                     document.getElementById('stat-total-members').innerText = snap.size;
                     if (snap.empty) {
-                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data member.</td></tr>`;
+                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada member terdaftar.</td></tr>`;
                         return;
                     }
                     list.innerHTML = "";
                     snap.forEach(d => {
-                        list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic">Terdaftar</td></tr>`;
+                        list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs text-slate-600">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic font-bold">Terdaftar</td></tr>`;
                     });
-                });
+                }, (err) => console.error("Error members:", err));
 
                 onSnapshot(attendanceColRef, (snap) => {
                     const list = document.getElementById('attendance-list');
                     document.getElementById('stat-total-views').innerText = snap.size;
                     if (snap.empty) {
-                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Tidak ada data kehadiran hari ini.</td></tr>`;
+                        list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada absensi hari ini.</td></tr>`;
                         return;
                     }
                     list.innerHTML = "";
                     snap.forEach(d => {
                         const data = d.data();
-                        list.innerHTML += `<tr><td class="px-4 py-3 font-bold">${data.userName || 'Anonymous'}</td><td class="px-4 py-3 text-slate-500">${data.time || '-'}</td></tr>`;
+                        list.innerHTML += `<tr><td class="px-4 py-3 font-bold text-slate-700">${data.userName || 'Anonymous User'}</td><td class="px-4 py-3 text-slate-400 font-mono text-xs">${data.time || '-'}</td></tr>`;
                     });
-                });
+                }, (err) => console.error("Error attendance:", err));
 
                 initCharts();
             } catch (e) {
-                console.error("Firebase Error:", e);
+                console.error("Firebase Auth Error:", e);
             }
         }
 
-        // CRUD
+        // CRUD Pelatihan
         document.getElementById('pelatihan-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.innerText = "MEMPROSES...";
+            const btn = document.getElementById('btn-submit-pelatihan');
+            btn.disabled = true;
+            btn.innerText = "SEDANG MEMPROSES...";
+            
             const title = document.getElementById('p-title').value;
             const yt = document.getElementById('p-yt').value;
             const zm = document.getElementById('p-zm').value;
-            const dateStr = new Date().toLocaleString('id-ID');
+            const dateStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
 
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), { youtubeUrl: yt, zoomUrl: zm }, { merge: true });
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { title, yt, zm, date: dateStr });
+                if (!auth.currentUser) await signInAnonymously(auth);
+
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), { 
+                    youtubeUrl: yt, 
+                    zoomUrl: zm,
+                    lastUpdated: dateStr 
+                }, { merge: true });
+
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { 
+                    title: title, 
+                    yt: yt, 
+                    zm: zm, 
+                    date: dateStr 
+                });
+
                 e.target.reset();
-                alert("Berhasil diperbarui!");
-            } catch (err) { alert("Gagal menyimpan. Cek konfigurasi Firebase."); } finally { btn.innerText = "PUBLIKASIKAN"; }
+                alert("Pelatihan berhasil dipublikasikan ke semua member!");
+            } catch (err) { 
+                console.error("Error submit:", err);
+                alert("Gagal menyimpan ke Firebase. Cek Rules Firestore atau Konfigurasi."); 
+            } finally { 
+                btn.disabled = false;
+                btn.innerText = "PUBLIKASIKAN"; 
+            }
         };
 
         window.deleteHistory = async (id) => {
-            if(confirm("Hapus?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
+            if(confirm("Apakah Anda yakin ingin menghapus data histori ini?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
+                } catch (e) {
+                    alert("Gagal menghapus.");
+                }
+            }
         };
 
         function initCharts() {
@@ -353,9 +388,14 @@
                 type: 'line',
                 data: {
                     labels: ['Sesi 1', 'Sesi 2', 'Sesi 3', 'Sesi 4'],
-                    datasets: [{ label: 'Interaksi', data: [10, 45, 25, 60], borderColor: '#2563eb', tension: 0.4 }]
+                    datasets: [{ label: 'Interaksi User', data: [15, 32, 28, 45], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
             });
         }
 
