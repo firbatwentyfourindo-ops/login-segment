@@ -17,69 +17,47 @@
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .empty-state { @apply flex flex-col items-center justify-center py-12 text-slate-400 text-sm italic; }
-        
-        /* Animasi transisi antar tahap login */
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Screen: Login (Hybrid Google + Password) -->
+    <!-- Screen: Login -->
     <div id="screen-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 text-center border border-slate-100">
             <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-12 mx-auto mb-8">
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Admin Portal</h2>
             
-            <!-- Tahap 1: Google Auth -->
             <div id="login-step-1" class="fade-in">
-                <p class="text-slate-500 text-sm mb-10">Langkah 1: Verifikasi Identitas Google</p>
+                <p class="text-slate-500 text-sm mb-10">Verifikasi Identitas Administrator</p>
                 <button id="btn-google-login" class="w-full flex items-center justify-center gap-4 bg-white border border-slate-200 text-slate-700 font-bold py-4 rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
                     <svg class="w-6 h-6" viewBox="0 0 48 48">
                         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
-                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path>
-                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
                     </svg>
                     Masuk dengan Google
                 </button>
             </div>
 
-            <!-- Tahap 2: Admin Credentials -->
             <div id="login-step-2" class="hidden fade-in text-left">
-                <p class="text-slate-500 text-sm mb-6 text-center">Langkah 2: Verifikasi Akses Administrator</p>
                 <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl mb-6">
-                    <img id="login-avatar" src="" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                    <img id="login-avatar" src="" class="w-10 h-10 rounded-full border-2 border-white">
                     <div class="overflow-hidden">
                         <p id="login-user-name" class="text-xs font-bold text-slate-800 truncate"></p>
                         <p id="login-user-email" class="text-[10px] text-blue-600 font-medium truncate"></p>
                     </div>
                 </div>
-                
                 <form id="admin-verify-form" class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 tracking-wider">Username</label>
-                        <input type="text" id="verify-user" required class="input-field mt-1" placeholder="admin">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 tracking-wider">Password</label>
-                        <input type="password" id="verify-pass" required class="input-field mt-1" placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all">KONFIRMASI AKSES</button>
-                    <button type="button" onclick="cancelLogin()" class="w-full text-slate-400 text-xs font-bold py-2 hover:text-slate-600 transition-all">Ganti Akun Google</button>
+                    <input type="password" id="verify-pass" required class="input-field mt-1" placeholder="Masukkan Password Admin">
+                    <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-black transition-all">VERIFIKASI & MASUK</button>
                 </form>
             </div>
-
-            <p id="login-error" class="text-red-500 text-xs font-bold mt-6 hidden">Kredensial admin salah!</p>
+            <p id="login-error" class="text-red-500 text-[10px] font-bold mt-4 hidden uppercase tracking-widest">Akses Ditolak</p>
         </div>
     </div>
 
     <!-- Screen: Dashboard -->
     <div id="screen-dashboard" class="hidden flex h-screen overflow-hidden">
-        
-        <!-- Sidebar -->
         <aside class="w-72 bg-white border-r border-slate-200 flex flex-col p-6 overflow-y-auto no-scrollbar">
             <div class="mb-10 text-center">
                 <img src="https://greciaco.id/wp-content/uploads/2025/09/cropped-cropped-logo_grecia-1-e1758353731842.png" alt="Logo" class="h-8 mx-auto mb-4">
@@ -87,133 +65,100 @@
                     <img id="admin-photo" src="" class="w-8 h-8 rounded-full border border-white">
                     <div class="text-left overflow-hidden">
                         <p id="display-admin-name" class="text-xs font-bold text-slate-800 truncate">Admin</p>
-                        <p id="display-admin-email" class="text-[9px] text-slate-400 truncate">email@admin.com</p>
+                        <p id="display-admin-email" class="text-[9px] text-slate-400 truncate">admin@grecia.edu</p>
                     </div>
                 </div>
             </div>
 
             <nav class="space-y-2 flex-1">
                 <div onclick="switchTab('general')" id="nav-general" class="sidebar-item active">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    General Analitik
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    Statistik Utama
                 </div>
                 <div onclick="switchTab('viewers')" id="nav-viewers" class="sidebar-item inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    Viewers & Absensi
-                </div>
-                <div onclick="switchTab('members')" id="nav-members" class="sidebar-item inactive">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    Management Members
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Kehadiran Peserta
                 </div>
                 <div onclick="switchTab('connect')" id="nav-connect" class="sidebar-item inactive">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    Connect Pelatihan
+                    Update Pelatihan
                 </div>
             </nav>
 
-            <div class="mt-auto pt-6 border-t border-slate-100">
-                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-sm hover:bg-red-100 transition-all">
-                    LogOut Sesi
-                </button>
-            </div>
+            <button onclick="handleLogout()" class="mt-auto w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100">Keluar Sesi</button>
         </aside>
 
-        <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden">
             <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0">
-                <h2 id="tab-title" class="text-xl font-bold text-slate-800">General Analitik</h2>
-                <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Administrator Sesi</p>
-                    </div>
+                <h2 id="tab-title" class="text-lg font-bold text-slate-800">Statistik Utama</h2>
+                <div id="system-status" class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistem Online</span>
                 </div>
             </header>
 
             <div id="content-area" class="flex-1 overflow-y-auto p-8 no-scrollbar">
                 
-                <!-- Tab [General] -->
+                <!-- Tab: General -->
                 <section id="tab-general" class="tab-pane space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Viewers</p>
-                            <h3 class="text-3xl font-bold" id="stat-total-views">0</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Kehadiran Hari Ini</p>
+                            <h3 class="text-3xl font-bold" id="stat-attendance">0</h3>
                         </div>
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Members Terdaftar</p>
-                            <h3 class="text-3xl font-bold" id="stat-total-members">0</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Pendaftar</p>
+                            <h3 class="text-3xl font-bold" id="stat-registrations">0</h3>
                         </div>
                         <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pelatihan Aktif</p>
-                            <h3 class="text-3xl font-bold" id="stat-active-sessions">0</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Status Streaming</p>
+                            <h3 class="text-3xl font-bold text-blue-600" id="stat-streaming">Aktif</h3>
                         </div>
-                        <div class="glass-card">
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Sistem</p>
-                            <h3 class="text-3xl font-bold text-green-500">Online</h3>
-                        </div>
-                    </div>
-                    <div class="glass-card h-80">
-                        <canvas id="chartGeneral"></canvas>
                     </div>
                 </section>
 
-                <!-- Tab [Viewers] -->
-                <section id="tab-viewers" class="tab-pane hidden space-y-6">
-                    <div class="glass-card">
-                        <h4 class="font-bold mb-4">Log Absensi & Kehadiran Real-time</h4>
+                <!-- Tab: Viewers -->
+                <section id="tab-viewers" class="tab-pane hidden">
+                    <div class="glass-card overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-bold uppercase">
                                     <tr>
-                                        <th class="px-4 py-3">Nama User</th>
-                                        <th class="px-4 py-3">Waktu Kehadiran</th>
+                                        <th class="px-6 py-4">Nama Peserta</th>
+                                        <th class="px-6 py-4">Waktu Masuk</th>
+                                        <th class="px-6 py-4">Email</th>
                                     </tr>
                                 </thead>
-                                <tbody id="attendance-list" class="divide-y divide-slate-100">
-                                    <!-- Render Otomatis -->
-                                </tbody>
+                                <tbody id="attendance-list" class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
                     </div>
                 </section>
 
-                <!-- Tab [Members] -->
-                <section id="tab-members" class="tab-pane hidden space-y-6">
+                <!-- Tab: Connect -->
+                <section id="tab-connect" class="tab-pane hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div class="glass-card">
-                        <h4 class="font-bold mb-4">Database Seluruh Member</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
-                                    <tr>
-                                        <th class="px-4 py-3">UID / ID User</th>
-                                        <th class="px-4 py-3 text-right">Info</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="member-list" class="divide-y divide-slate-100">
-                                    <!-- Render Otomatis -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tab [Connect] -->
-                <section id="tab-connect" class="tab-pane hidden space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card">
-                            <h4 class="font-bold mb-4">Buat Pelatihan Baru</h4>
-                            <form id="pelatihan-form" class="space-y-4">
-                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Judul Pelatihan</label><input type="text" id="p-title" required class="input-field mt-1" placeholder="..."></div>
-                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link YouTube</label><input type="url" id="p-yt" required class="input-field mt-1" placeholder="..."></div>
-                                <div><label class="text-[10px] font-bold text-slate-400 uppercase">Link Zoom</label><input type="url" id="p-zm" required class="input-field mt-1" placeholder="..."></div>
-                                <button type="submit" id="btn-submit-pelatihan" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700">PUBLIKASIKAN</button>
-                            </form>
-                        </div>
-                        <div class="glass-card">
-                            <h4 class="font-bold mb-4">Histori Pelatihan</h4>
-                            <div class="space-y-3" id="history-list">
-                                <!-- Render Otomatis -->
+                        <h4 class="font-bold mb-6 text-sm">Update Konten Pelatihan</h4>
+                        <form id="pelatihan-form" class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Judul Sesi</label>
+                                <input type="text" id="p-title" required class="input-field mt-1" placeholder="Contoh: Webinar Strategi Marketing">
                             </div>
-                        </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">URL YouTube Live</label>
+                                <input type="url" id="p-yt" required class="input-field mt-1" placeholder="https://youtube.com/live/...">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">URL Zoom Meeting</label>
+                                <input type="url" id="p-zm" required class="input-field mt-1" placeholder="https://zoom.us/j/...">
+                            </div>
+                            <button type="submit" id="btn-publish" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">PUBLIKASIKAN SEKARANG</button>
+                        </form>
+                    </div>
+                    
+                    <div class="glass-card">
+                        <h4 class="font-bold mb-6 text-sm">Histori Publikasi</h4>
+                        <div id="history-list" class="space-y-3"></div>
                     </div>
                 </section>
 
@@ -224,9 +169,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, addDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
             authDomain: "registrasi-user-grecia.firebaseapp.com",
@@ -242,244 +186,162 @@
         const provider = new GoogleAuthProvider();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grecia-edu-prod';
 
-        // --- STATE MANAGEMENT ---
         let currentGoogleUser = null;
-        let isFullyAuthenticated = false;
+        let isVerified = localStorage.getItem('grecia_admin_session') === 'active';
 
-        const btnGoogle = document.getElementById('btn-google-login');
-        const screenLogin = document.getElementById('screen-login');
-        const step1 = document.getElementById('login-step-1');
-        const step2 = document.getElementById('login-step-2');
-        const screenDashboard = document.getElementById('screen-dashboard');
-        const errorMsg = document.getElementById('login-error');
+        // --- AUTH LOGIC ---
+        const loginBtn = document.getElementById('btn-google-login');
         const verifyForm = document.getElementById('admin-verify-form');
+        const errorMsg = document.getElementById('login-error');
 
-        // Check local storage for persistent session
-        const storedSession = localStorage.getItem('grecia_admin_verified');
-        if (storedSession === 'true') {
-            isFullyAuthenticated = true;
-        }
-
-        // STEP 1: GOOGLE SIGN-IN
-        btnGoogle.onclick = async () => {
+        loginBtn.onclick = async () => {
             try {
-                const result = await signInWithPopup(auth, provider);
-                currentGoogleUser = result.user;
-                
-                // Pindah ke tahap 2
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                document.getElementById('login-avatar').src = currentGoogleUser.photoURL;
-                document.getElementById('login-user-name').innerText = currentGoogleUser.displayName;
-                document.getElementById('login-user-email').innerText = currentGoogleUser.email;
-                errorMsg.classList.add('hidden');
-            } catch (error) {
-                console.error("Google Login Error:", error);
-            }
+                const res = await signInWithPopup(auth, provider);
+                currentGoogleUser = res.user;
+                document.getElementById('login-step-1').classList.add('hidden');
+                document.getElementById('login-step-2').classList.remove('hidden');
+                document.getElementById('login-avatar').src = res.user.photoURL;
+                document.getElementById('login-user-name').innerText = res.user.displayName;
+                document.getElementById('login-user-email').innerText = res.user.email;
+            } catch (e) { console.error(e); }
         };
 
-        // STEP 2: USERNAME & PASSWORD VERIFICATION
         verifyForm.onsubmit = (e) => {
             e.preventDefault();
-            const user = document.getElementById('verify-user').value;
             const pass = document.getElementById('verify-pass').value;
-
-            // Kredensial Statis Sesuai Request
-            if (user === "admin" && pass === "grecia123") {
-                isFullyAuthenticated = true;
-                localStorage.setItem('grecia_admin_verified', 'true');
-                showDashboard(currentGoogleUser);
+            // Password admin statis
+            if (pass === "grecia123") {
+                isVerified = true;
+                localStorage.setItem('grecia_admin_session', 'active');
+                initDashboard(currentGoogleUser);
             } else {
                 errorMsg.classList.remove('hidden');
-                errorMsg.innerText = "Username atau Password admin salah!";
             }
-        };
-
-        window.cancelLogin = async () => {
-            await signOut(auth);
-            step2.classList.add('hidden');
-            step1.classList.remove('hidden');
-            errorMsg.classList.add('hidden');
-            currentGoogleUser = null;
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (user && isFullyAuthenticated) {
-                showDashboard(user);
-            } else if (user && !isFullyAuthenticated) {
-                // User login google tapi belum verifikasi password (misal setelah refresh)
-                currentGoogleUser = user;
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-                document.getElementById('login-avatar').src = user.photoURL;
-                document.getElementById('login-user-name').innerText = user.displayName;
-                document.getElementById('login-user-email').innerText = user.email;
+            if (user && isVerified) {
+                initDashboard(user);
             } else {
-                showLogin();
+                document.getElementById('screen-login').classList.remove('hidden');
+                document.getElementById('screen-dashboard').classList.add('hidden');
             }
         });
 
-        function showDashboard(user) {
-            screenLogin.classList.add('hidden');
-            screenDashboard.classList.remove('hidden');
-            document.getElementById('display-admin-name').innerText = user.displayName || "Admin";
-            document.getElementById('display-admin-email').innerText = user.email;
-            document.getElementById('admin-photo').src = user.photoURL || "https://ui-avatars.com/api/?name=Admin";
-            startDataListeners();
-        }
-
-        function showLogin() {
-            screenLogin.classList.remove('hidden');
-            screenDashboard.classList.add('hidden');
-            step1.classList.remove('hidden');
-            step2.classList.add('hidden');
-        }
-
         window.handleLogout = async () => {
-            isFullyAuthenticated = false;
-            localStorage.removeItem('grecia_admin_verified');
+            isVerified = false;
+            localStorage.removeItem('grecia_admin_session');
             await signOut(auth);
         };
 
-        // TAB SYSTEM
-        window.switchTab = (tabId) => {
+        // --- DASHBOARD LOGIC ---
+        function initDashboard(user) {
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.remove('hidden');
+            document.getElementById('display-admin-name').innerText = user.displayName;
+            document.getElementById('display-admin-email').innerText = user.email;
+            document.getElementById('admin-photo').src = user.photoURL;
+            startListeners();
+        }
+
+        window.switchTab = (id) => {
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-            const target = document.getElementById(`tab-${tabId}`);
-            if (target) target.classList.remove('hidden');
-            
-            document.querySelectorAll('.sidebar-item').forEach(i => { i.classList.remove('active'); i.classList.add('inactive'); });
-            const nav = document.getElementById(`nav-${tabId}`);
-            if (nav) {
-                nav.classList.add('active');
-                nav.classList.remove('inactive');
-            }
-            document.getElementById('tab-title').innerText = tabId === 'general' ? 'General Analitik' : (tabId === 'viewers' ? 'Viewers & Absensi' : (tabId === 'members' ? 'Management Members' : 'Connect Pelatihan'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.replace('active', 'inactive'));
+            document.getElementById(`nav-${id}`).classList.replace('inactive', 'active');
+            document.getElementById('tab-title').innerText = id === 'general' ? 'Statistik Utama' : (id === 'viewers' ? 'Kehadiran Peserta' : 'Update Pelatihan');
         };
 
-        // LISTENERS
-        let listenersActive = false;
-        async function startDataListeners() {
-            if (listenersActive) return;
-            listenersActive = true;
-
-            const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings');
-            const historyColRef = collection(db, 'artifacts', appId, 'public', 'data', 'history');
-            const membersColRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_list');
-            const attendanceColRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
-
-            onSnapshot(settingsDocRef, (snap) => {
-                document.getElementById('stat-active-sessions').innerText = snap.exists() ? "1" : "0";
-            });
-
-            onSnapshot(historyColRef, (snap) => {
-                const list = document.getElementById('history-list');
-                if (snap.empty) {
-                    list.innerHTML = `<div class="empty-state">Tidak ada histori pelatihan.</div>`;
-                    return;
-                }
+        // --- DATA LISTENERS ---
+        function startListeners() {
+            // Stats & Attendance
+            const attCol = collection(db, 'artifacts', appId, 'public', 'data', 'attendance');
+            onSnapshot(attCol, (snap) => {
+                document.getElementById('stat-attendance').innerText = snap.size;
+                const list = document.getElementById('attendance-list');
                 list.innerHTML = "";
                 snap.forEach(d => {
                     const item = d.data();
                     list.innerHTML += `
-                        <div class="p-4 bg-slate-50 rounded-2xl flex justify-between items-center group">
-                            <div class="overflow-hidden">
-                                <h5 class="font-bold text-xs truncate">${item.title}</h5>
-                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Tanggal tidak diketahui'}</p>
-                            </div>
-                            <button onclick="window.deleteHistory('${d.id}')" class="text-red-400 hover:text-red-600 text-xs font-bold transition-colors">Hapus</button>
-                        </div>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-700">${item.userName}</td>
+                            <td class="px-6 py-4 text-slate-400 font-mono">${item.time || '-'}</td>
+                            <td class="px-6 py-4 text-slate-400">${item.userEmail || '-'}</td>
+                        </tr>
                     `;
                 });
             });
 
-            onSnapshot(membersColRef, (snap) => {
-                const list = document.getElementById('member-list');
-                document.getElementById('stat-total-members').innerText = snap.size;
-                if (snap.empty) {
-                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada member terdaftar.</td></tr>`;
-                    return;
-                }
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    list.innerHTML += `<tr><td class="px-4 py-3 font-mono text-xs text-slate-600">${d.id}</td><td class="px-4 py-3 text-right text-[10px] text-slate-400 italic font-bold">Terdaftar</td></tr>`;
-                });
+            // Total Registrations
+            const regCol = collection(db, 'artifacts', appId, 'public', 'data', 'registrations');
+            onSnapshot(regCol, (snap) => {
+                document.getElementById('stat-registrations').innerText = snap.size;
             });
 
-            onSnapshot(attendanceColRef, (snap) => {
-                const list = document.getElementById('attendance-list');
-                document.getElementById('stat-total-views').innerText = snap.size;
-                if (snap.empty) {
-                    list.innerHTML = `<tr><td colspan="2" class="empty-state">Belum ada absensi hari ini.</td></tr>`;
-                    return;
-                }
+            // History
+            const histCol = collection(db, 'artifacts', appId, 'public', 'data', 'history');
+            onSnapshot(histCol, (snap) => {
+                const list = document.getElementById('history-list');
                 list.innerHTML = "";
                 snap.forEach(d => {
-                    const data = d.data();
-                    list.innerHTML += `<tr><td class="px-4 py-3 font-bold text-slate-700">${data.userName || 'Anonymous User'}</td><td class="px-4 py-3 text-slate-400 font-mono text-xs">${data.time || '-'}</td></tr>`;
+                    const item = d.data();
+                    list.innerHTML += `
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center group">
+                            <div class="overflow-hidden">
+                                <h5 class="font-bold text-xs truncate">${item.title}</h5>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${item.date || 'Baru'}</p>
+                            </div>
+                            <button onclick="window.deleteEntry('${d.id}')" class="text-red-400 hover:text-red-600 text-[10px] font-bold">HAPUS</button>
+                        </div>
+                    `;
                 });
             });
-
-            initCharts();
         }
 
-        // CRUD Pelatihan
+        // --- FORM ACTION ---
         document.getElementById('pelatihan-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit-pelatihan');
+            const btn = document.getElementById('btn-publish');
             btn.disabled = true;
-            btn.innerText = "SEDANG MEMPROSES...";
-            
-            const title = document.getElementById('p-title').value;
-            const yt = document.getElementById('p-yt').value;
-            const zm = document.getElementById('p-zm').value;
-            const dateStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            btn.innerText = "MENYIMPAN...";
+
+            const payload = {
+                title: document.getElementById('p-title').value,
+                youtubeUrl: document.getElementById('p-yt').value,
+                zoomUrl: document.getElementById('p-zm').value,
+                date: new Date().toLocaleString('id-ID')
+            };
 
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), { 
-                    youtubeUrl: yt, 
-                    zoomUrl: zm,
-                    lastUpdated: dateStr 
+                // Update Global Settings (untuk Dashboard User)
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), {
+                    youtubeUrl: payload.youtubeUrl,
+                    zoomUrl: payload.zoomUrl,
+                    updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), { 
-                    title: title, 
-                    yt: yt, 
-                    zm: zm, 
-                    date: dateStr 
+                // Add to History
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'history'), {
+                    ...payload,
+                    createdAt: serverTimestamp()
                 });
 
                 e.target.reset();
-                alert("Pelatihan berhasil dipublikasikan!");
-            } catch (err) { 
-                alert("Gagal menyimpan data."); 
-            } finally { 
+                alert("Berhasil dipublikasikan!");
+            } catch (err) {
+                console.error(err);
+                alert("Gagal memproses.");
+            } finally {
                 btn.disabled = false;
-                btn.innerText = "PUBLIKASIKAN"; 
+                btn.innerText = "PUBLIKASIKAN SEKARANG";
             }
         };
 
-        window.deleteHistory = async (id) => {
-            if(confirm("Hapus histori?")) {
+        window.deleteEntry = async (id) => {
+            if(confirm("Hapus dari histori?")) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'history', id));
             }
         };
-
-        function initCharts() {
-            const ctx = document.getElementById('chartGeneral').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Sesi 1', 'Sesi 2', 'Sesi 3', 'Sesi 4'],
-                    datasets: [{ label: 'Interaksi User', data: [15, 32, 28, 45], borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4 }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
     </script>
 </body>
 </html>
