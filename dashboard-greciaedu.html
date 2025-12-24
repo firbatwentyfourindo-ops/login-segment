@@ -217,7 +217,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyADKDlwOX4DNu05MFe9H1CY3r8NHoc9sQU",
@@ -344,8 +344,12 @@
             }
         }
 
-        function updateUserProfile(user) {
-            document.getElementById('user-name').innerText = (user.displayName || 'User').split(' ')[0];
+        function updateUserProfile(user, dbFullName = null) {
+            // Gunakan nama dari DB jika ada, jika tidak gunakan display name auth, fallback ke 'User'
+            const displayName = dbFullName || user.displayName || 'User';
+            
+            document.getElementById('user-name').innerText = displayName;
+            
             const statusIndicator = document.getElementById('status-indicator');
             const avatar = document.getElementById('user-avatar');
             const initial = document.getElementById('user-initial');
@@ -360,7 +364,7 @@
             } else {
                 avatar.classList.add('hidden');
                 initial.classList.remove('hidden');
-                initial.innerText = (user.displayName || 'U').charAt(0).toUpperCase();
+                initial.innerText = displayName.charAt(0).toUpperCase();
             }
         }
 
@@ -410,14 +414,33 @@
         }
 
         // --- Main Auth Listener ---
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const loadingOverlay = document.getElementById('loading-overlay');
             const mainContainer = document.getElementById('main-container');
             const loggedOutView = document.getElementById('logged-out-view');
 
             if (user) {
                 currentUser = user;
+                
+                // Render awal dengan data Auth
                 updateUserProfile(user);
+
+                // Ambil FullName dari Collection 'registrations'
+                try {
+                    const q = query(
+                        collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), 
+                        where('email', '==', user.email)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const userData = querySnapshot.docs[0].data();
+                        if (userData.fullName) {
+                            updateUserProfile(user, userData.fullName);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Gagal mengambil profil user:", e);
+                }
 
                 mainContainer.classList.remove('hidden');
                 loggedOutView.classList.add('hidden');
