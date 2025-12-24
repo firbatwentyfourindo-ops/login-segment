@@ -404,16 +404,13 @@
 
         // Realtime Logic
         function initData() {
-            // Settings
-            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    activeSessionId = data.sessionId || "ID-UNKNOWN";
-                }
-            });
+            let userRegistry = {}; // Store email -> fullName mapping
+            let attendanceSnapshot = null; // Store last attendance snap
 
-            // Attendance - GROUPED BY SESSION
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
+            // Function to render attendance list (called by both listeners)
+            const renderAttendanceList = () => {
+                if (!attendanceSnapshot) return;
+                const snap = attendanceSnapshot;
                 const listContainer = document.getElementById('viewer-list');
                 listContainer.innerHTML = "";
                 
@@ -430,9 +427,7 @@
                     grouped[sid].push({ id: doc.id, ...data });
                 });
 
-                // Iterate Groups (We can sort groups if needed, here we just use object keys order)
-                // To sort by session name desc or date desc, we would need to convert to array first.
-                // Assuming alphabetical sort of Session ID for now or reverse insertion order if numeric
+                // Iterate Groups (Sorted by Session ID)
                 const sessionIds = Object.keys(grouped).sort().reverse(); 
 
                 sessionIds.forEach(sid => {
@@ -472,8 +467,8 @@
                             timeZoneName: 'short'
                         }).format(date) : '-';
 
-                        // Combined string as requested: user1 . selasa, 23/12/25 : 17.52 WIB, judul-agenda001
-                        // We will display: Date : Time
+                        // Lookup Real Name from Registry
+                        const realName = userRegistry[it.userEmail] || it.userName || 'Anonymous';
                         const formattedTime = `${dateStr} : ${timeStr.replace('.', ':')}`; 
 
                         groupHtml += `
@@ -481,7 +476,7 @@
                                  <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors shadow-sm"></div>
                                  <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-bold text-slate-800 text-sm">${it.userName || 'Anonymous'}</span>
+                                        <span class="font-bold text-slate-800 text-sm">${realName}</span>
                                         <span class="text-[9px] px-1.5 py-0.5 rounded text-slate-500 bg-slate-100 font-mono border border-slate-200 uppercase tracking-tight">${it.channel || 'WEB'}</span>
                                     </div>
                                     <p class="text-xs text-slate-400 font-medium font-mono">${formattedTime}</p>
@@ -493,6 +488,15 @@
                     groupHtml += `</div></div>`;
                     listContainer.innerHTML += groupHtml;
                 });
+            };
+
+            // Settings
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'global', 'settings'), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    activeSessionId = data.sessionId || "ID-UNKNOWN";
+                    renderAttendanceList(); // Re-render to update counts based on active session
+                }
             });
 
             // Registrations
@@ -500,8 +504,13 @@
                 document.getElementById('stat-members').innerText = snap.size;
                 const list = document.getElementById('member-list');
                 list.innerHTML = "";
+                
                 snap.forEach(d => {
                     const it = d.data();
+                    
+                    // Populate User Registry for Attendance Lookup
+                    if (it.email) userRegistry[it.email] = it.fullName;
+
                     list.innerHTML += `
                     <tr class="table-row-hover border-b border-slate-50 last:border-0">
                         <td class="px-8 py-4 font-semibold text-slate-700 text-sm">${it.fullName || '-'}</td>
@@ -516,6 +525,15 @@
                         <td class="px-8 py-4 text-xs text-slate-400 font-medium">${formatDate(it.submittedAt?.toDate())}</td>
                     </tr>`;
                 });
+
+                // Re-render attendance list to update names now that registry is populated
+                renderAttendanceList();
+            });
+
+            // Attendance
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance'), (snap) => {
+                attendanceSnapshot = snap;
+                renderAttendanceList();
             });
 
             // History
