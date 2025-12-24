@@ -453,47 +453,53 @@
                             <div class="space-y-3 pl-4 border-l-2 border-slate-50 ml-1.5 pb-2">
                     `;
 
-                    // Build Items
-                    items.forEach(it => {
-                        const date = it.clickedAt?.toDate();
-                        
-                        // Formatter: Selasa, 23/12/25
-                        const dateStr = date ? new Intl.DateTimeFormat('id-ID', { 
-                            weekday: 'long', 
-                            day: '2-digit', 
-                            month: '2-digit', 
-                            year: '2-digit' 
-                        }).format(date) : '-';
-                        
-                        // Formatter: 17.52 WIB
-                        const timeStr = date ? new Intl.DateTimeFormat('id-ID', { 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            timeZoneName: 'short'
-                        }).format(date) : '-';
-
-                        // Combined string as requested: user1 . selasa, 23/12/25 : 17.52 WIB, judul-agenda001
-                        // We will display: Date : Time
-                        const formattedTime = `${dateStr} : ${timeStr.replace('.', ':')}`; 
-
-                        groupHtml += `
-                            <div class="flex items-start gap-4 group hover:bg-slate-50 p-2.5 rounded-xl transition-all duration-200">
-                                 <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors shadow-sm"></div>
-                                 <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-bold text-slate-800 text-sm">${it.fullName || 'Anonymous'}</span>
-                                        <span class="text-[9px] px-1.5 py-0.5 rounded text-slate-500 bg-slate-100 font-mono border border-slate-200 uppercase tracking-tight">${it.channel || 'WEB'}</span>
-                                    </div>
-                                    <p class="text-xs text-slate-400 font-medium font-mono">${formattedTime}</p>
-                                 </div>
+           // Build Items
+            function renderItems(items) {
+                let groupHtml = `<div class="space-y-2">`;
+            
+                items.forEach(it => {
+                    const date = it.clickedAt?.toDate();
+            
+                    // Formatter: Selasa, 23/12/25
+                    const dateStr = date ? new Intl.DateTimeFormat('id-ID', { 
+                        weekday: 'long', 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: '2-digit' 
+                    }).format(date) : '-';
+            
+                    // Formatter: 17.52 WIB
+                    const timeStr = date ? new Intl.DateTimeFormat('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        timeZoneName: 'short'
+                    }).format(date) : '-';
+            
+                    const formattedTime = `${dateStr} : ${timeStr.replace('.', ':')}`;
+            
+                    groupHtml += `
+                        <div class="flex items-start gap-4 group hover:bg-slate-50 p-2.5 rounded-xl transition-all duration-200">
+                            <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-300 group-hover:bg-blue-500 transition-colors shadow-sm"></div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-slate-800 text-sm">
+                                      ${it.fullName || 'Anonymous'}
+                                    </span>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded text-slate-500 bg-slate-100 font-mono border border-slate-200 uppercase tracking-tight">
+                                      ${it.channel || 'WEB'}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-400 font-medium font-mono">
+                                  ${formattedTime}
+                                </p>
                             </div>
-                        `;
-                    });
-
-                    groupHtml += `</div></div>`;
-                    listContainer.innerHTML += groupHtml;
+                        </div>
+                    `;
                 });
-            });
+            
+                groupHtml += `</div>`;
+                listContainer.innerHTML = groupHtml;
+            }
 
             // Registrations
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'registrations'), (snap) => {
